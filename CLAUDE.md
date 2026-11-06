@@ -12,6 +12,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - After changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, regenerate: `dart run build_runner build -d` (or `watch -d`).
 - Lints: `flutter_lints` via `analysis_options.yaml`; `android/` and `ios/` are excluded from analysis.
 
+## Flavors (dev / staging / prod)
+
+| flavor | bundle / applicationId | app name |
+|---|---|---|
+| dev | `com.weus.weus.dev` | 위어스 dev |
+| staging | `com.weus.weus.staging` | 위어스 stg |
+| prod | `com.weus.weus` | 위어스 |
+
+- `flutter run --flavor staging -t lib/main_staging.dart` (entry files `main_<flavor>.dart` call `bootstrap('<flavor>')` in `main.dart`). Keep `--flavor` and `-t` matching. Plain `flutter run` → `dev` (`default-flavor` in pubspec, env from `appFlavor`).
+- App-wide startup code goes in `bootstrap()` in `lib/main.dart`, not in the per-flavor entry files.
+- Android: `productFlavors` in `android/app/build.gradle.kts`, label via `resValue("string","app_name")`.
+- iOS: build configs `Debug-<flavor>` / `Release-<flavor>` / `Profile-<flavor>` + schemes `dev`/`staging`/`prod`. Bundle id and `APP_DISPLAY_NAME` (→ `CFBundleDisplayName`) are set per config in `project.pbxproj`. Adding a flavor means adding all three configs + a scheme.
+- Env: `main.dart` loads `.env.$appFlavor` via `flutter_dotenv`. `.env.*` files are gitignored but declared as assets, so **a fresh clone must create `.env.dev`, `.env.staging`, `.env.prod` from `.env.example` before building**. Everything in them ships inside the app bundle — no real secrets.
+- Android `compileSdk = 37` (required by `permission_handler`); `android.suppressUnsupportedCompileSdk=37` silences the AGP warning.
+
 ## Commands
 
 ```bash

@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+/// `flutter run --flavor x` (no -t) lands here and picks the env from the flavor.
+Future<void> main() => bootstrap(appFlavor ?? 'dev');
+
+/// Shared startup for every entry point (main_dev/staging/prod.dart).
+Future<void> bootstrap(String flavor) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env.$flavor');
   runApp(const MyApp());
 }
 

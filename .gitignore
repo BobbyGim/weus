@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Env (flavor별 .env.dev / .env.staging / .env.prod)
+.env*
+!.env.example
