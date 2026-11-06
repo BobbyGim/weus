@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.weus.weus"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37 // permission_handler requires 37+
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -27,6 +27,28 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    buildFeatures {
+        resValues = true
+    }
+
+    flavorDimensions += "env"
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "위어스 dev")
+        }
+        create("staging") {
+            dimension = "env"
+            applicationIdSuffix = ".staging"
+            resValue("string", "app_name", "위어스 stg")
+        }
+        create("prod") {
+            dimension = "env"
+            resValue("string", "app_name", "위어스")
+        }
     }
 
     buildTypes {
