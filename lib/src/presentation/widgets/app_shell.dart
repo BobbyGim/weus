@@ -9,6 +9,11 @@ class AppShell extends StatelessWidget {
 
   static const _tabs = [
     (label: '홈', icon: Icons.home_outlined, selected: Icons.home),
+    (
+      label: '일정',
+      icon: Icons.calendar_month_outlined,
+      selected: Icons.calendar_month,
+    ),
     (label: '마이페이지', icon: Icons.person_outline, selected: Icons.person),
   ];
 

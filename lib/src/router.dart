@@ -19,6 +19,12 @@ GoRouter router(Ref ref) => GoRouter(
         ),
 
         StatefulShellBranch(
+          routes: [
+            GoRoute(path: '/schedule', builder: (_, _) => const SchedulePage()),
+          ],
+        ),
+
+        StatefulShellBranch(
           routes: [GoRoute(path: '/mypage', builder: (_, _) => const MyPage())],
         ),
       ],

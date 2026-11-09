@@ -4,11 +4,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'hooks/use_home_banner_carousel.dart';
 
+// ponytail: static asset banners; move to a repository + ViewModel once banners come from the API.
+const _banners = [
+  'assets/image/banner/banner_1.png',
+  'assets/image/banner/banner_2.png',
+  'assets/image/banner/banner_3.png',
+];
+
 /// Auto-playing 2:1 home banner with a "1 / 3" counter over the image.
 class HomeBannerCarousel extends HookWidget {
-  const HomeBannerCarousel({super.key, required this.images});
-
-  final List<String> images;
+  const HomeBannerCarousel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class HomeBannerCarousel extends HookWidget {
           carouselController: banner.controller,
           options: banner.options,
           items: [
-            for (final src in images)
+            for (final src in _banners)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: banner.sidePadding),
                 child: ClipRRect(
@@ -46,7 +51,7 @@ class HomeBannerCarousel extends HookWidget {
                 style: const TextStyle(fontWeight: FontWeight.w700),
                 children: [
                   TextSpan(
-                    text: ' / ${images.length}',
+                    text: ' / ${_banners.length}',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withValues(alpha: 0.7),
