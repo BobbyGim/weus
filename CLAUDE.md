@@ -41,17 +41,30 @@ lib/
     ├── data/             # DTOs, datasources, repository impls
     └── presentation/
         ├── view_models/  # @riverpod Notifier/AsyncNotifier classes (<name>_view_model.dart)
-        ├── views/        # screens (<name>_view.dart), routed from router.dart
-        └── widgets/      # feature-only widgets
+        ├── hooks/        # custom hooks (use_<name>.dart), one per file
+        ├── pages/        # screens (<name>_page.dart, class <Name>Page), routed from router.dart
+        └── widgets/      # feature-only components
 ```
+
+### Naming
+
+- Screens are **pages**, never "views": folder `pages/`, file `<name>_page.dart`, class `<Name>Page` (`LoginPage`, not `LoginView`/`LoginScreen`). `ViewModel` keeps its name (MVVM term).
+
+### Custom hooks
+
+- Custom hooks always get their own file in `features/<feature>/presentation/hooks/`, never inline in a page/widget file.
+- Hook for a single page/widget → named after it: `Example` → `useExample()` in `use_example.dart`.
+- Used by a second feature → move to `core/hooks/` and export from `core/hooks/hooks.dart`.
+- No `widgets/hooks/` subfolders — hooks are placed by sharing scope, not by whether a page or widget calls them.
+- Built-in `flutter_hooks` hooks (`useTextEditingController`, `useState`…) are called directly in `build()`; don't wrap them.
 
 ### MVVM (presentation layer)
 
-- **Model** = `domain/` + `data/`. **ViewModel** = `presentation/view_models/`. **View** = `presentation/views/` + `widgets/`.
-- One ViewModel per screen: `LoginViewModel` (`@riverpod class LoginViewModel extends _$LoginViewModel`) ↔ `LoginView`. Its state is a `@freezed` `LoginState` in the same file, or `AsyncValue<T>` when it's just loading one thing.
+- **Model** = `domain/` + `data/`. **ViewModel** = `presentation/view_models/`. **View** = `presentation/pages/` + `widgets/`.
+- One ViewModel per screen: `LoginViewModel` (`@riverpod class LoginViewModel extends _$LoginViewModel`) ↔ `LoginPage`. Its state is a `@freezed` `LoginState` in the same file, or `AsyncValue<T>` when it's just loading one thing.
 - ViewModel: holds screen state, exposes intent methods (`signIn()`, `refresh()`), calls repositories via `ref.read(xRepositoryProvider)`. No `BuildContext`, no widgets, no `material.dart` import.
-- View: `ref.watch(loginViewModelProvider)` to render, `ref.read(loginViewModelProvider.notifier).signIn(...)` on events. No business logic, no repository calls. Navigation/snackbars/dialogs stay in the View (react with `ref.listen`).
-- Ephemeral UI-only state (text controllers, animation, focus, a toggle that nothing else reads) → hooks in the View, not the ViewModel.
+- Page: `ref.watch(loginViewModelProvider)` to render, `ref.read(loginViewModelProvider.notifier).signIn(...)` on events. No business logic, no repository calls. Navigation/snackbars/dialogs stay in the Page (react with `ref.listen`).
+- Ephemeral UI-only state (text controllers, animation, focus, a toggle that nothing else reads) → hooks in the Page/widget, not the ViewModel.
 - A ViewModel never watches another screen's ViewModel. State shared by several screens → a separate provider in `presentation/` (or a repository-backed provider), watched by each ViewModel.
 
 - Dependency direction: presentation → domain ← data. `features/*` → `core`; `core` never imports `features`. Features never import each other — move the shared piece to `core/` instead.
@@ -61,7 +74,7 @@ lib/
 ### Barrel files
 
 - Each `core/` subfolder and each feature has one barrel: `core/widgets/widgets.dart`, `features/auth/auth.dart`, etc. — `export` lines only.
-- A feature barrel exports only what other code needs (views for the router, providers other features read). Don't export data-layer internals.
+- A feature barrel exports only what other code needs (pages for the router, providers other features read). Don't export data-layer internals.
 - Import from outside the folder → through the barrel (`import 'package:weus/core/widgets/widgets.dart';`). Inside the same feature/folder → direct relative imports, never its own barrel (circular imports).
 - Never export generated `*.g.dart` / `*.freezed.dart` (they're `part` files).
 - When adding a public file, add its `export` to the barrel in the same change.
