@@ -6,7 +6,6 @@ const _sidePadding = 16.0;
 
 const _imageAspectRatio = 2.0;
 
-/// Controller, page index and carousel options for [HomeBannerCarousel].
 /// Autoplay is off when the OS "reduce motion" setting is on.
 ({
   CarouselSliderController controller,
