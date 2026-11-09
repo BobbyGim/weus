@@ -1,30 +1,43 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:weus/main.dart';
+import 'package:weus/splash_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('splash draws the logo, then moves to home', (tester) async {
+    await tester.pumpWidget(MyApp(flavor: 'dev'));
+    expect(find.byType(SplashPage), findsOneWidget);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pump(const Duration(seconds: 2)); // animation ends
+    await tester.pump(const Duration(seconds: 1)); // hold delay ends
+    await tester.pumpAndSettle();
+    expect(find.byType(SplashPage), findsNothing);
+    expect(find.text('Flutter Demo Home Page'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('logo paths match the source artwork', (tester) async {
+    // 1:1 with the source crop so the golden can be diffed against the PNG.
+    tester.view.physicalSize = const Size(868, 712);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      Center(
+        child: RepaintBoundary(
+          child: SizedBox(
+            width: 868,
+            height: 712,
+            child: CustomPaint(
+              painter: LogoPainter(
+                const AlwaysStoppedAnimation(1),
+                const Color(0xFF111111),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await expectLater(find.byType(RepaintBoundary).first,
+        matchesGoldenFile('goldens/logo.png'));
   });
 }
