@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 `weus` — Flutter app (Android/iOS only), Dart SDK ^3.13.5. Early stage: `lib/main.dart` (bootstrap, `MyApp`, template home page), `lib/router.dart`, and `main_<flavor>.dart` entry files.
 
 - Routing: `go_router`, exposed as `routerProvider` (`@Riverpod(keepAlive: true)`) in `lib/router.dart`; `MyApp` is a `ConsumerWidget` that watches it. Add routes there. `/` is the home page; no Flutter splash route.
+- Hooks: `flutter_hooks` + `hooks_riverpod`. Import `package:hooks_riverpod/hooks_riverpod.dart` (re-exports flutter_riverpod; `flutter_riverpod` is not a direct dependency). Widgets needing `ref` + local state (controllers, animations, focus nodes) → `HookConsumerWidget` with `useTextEditingController()` etc. instead of `ConsumerStatefulWidget`; `ref` only → `ConsumerWidget`; neither → `StatelessWidget`. Shared state stays in providers, not hooks.
 - State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. Generated `*.g.dart` files are committed. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
 - Models: `freezed` + `json_serializable`.
 - After changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, regenerate: `dart run build_runner build -d` (or `watch -d`).
