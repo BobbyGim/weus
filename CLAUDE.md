@@ -30,6 +30,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Splash is native only (no Flutter splash page): logo `splash_<light|dark>.png` (@4x, 180pt) + bottom wordmark `branding_<light|dark>.png` ("WeUs"); Android 12 uses `splash_a12_*.png` (1152px, logo kept inside the icon circle). If startup work is added (e.g. auth check), keep the native splash up with `FlutterNativeSplash.preserve()` / `remove()` instead of adding a splash route, so deep links land directly on their page.
 - Android `compileSdk = 37` (required by `permission_handler`); `android.suppressUnsupportedCompileSdk=37` silences the AGP warning.
 
+## Architecture (feature-first clean architecture)
+
+```
+lib/
+├── core/                 # shared: widgets/, theme/, extensions/, utils/, network/, error/
+└── features/<feature>/
+    ├── domain/           # entities, repository interfaces (pure Dart, no Flutter/data imports)
+    ├── data/             # DTOs, datasources, repository impls
+    └── presentation/     # @riverpod providers, pages, widgets
+```
+
+- Dependency direction: presentation → domain ← data. `features/*` → `core`; `core` never imports `features`. Features never import each other — move the shared piece to `core/` instead.
+- A widget used by one feature stays in that feature's `presentation/widgets/`; move it to `core/widgets/` only once a second feature needs it.
+- DI via Riverpod providers (no get_it). UseCases and separate Entity/DTO are optional — add them only when there's real logic or the shapes diverge.
+
+### Barrel files
+
+- Each `core/` subfolder and each feature has one barrel: `core/widgets/widgets.dart`, `features/auth/auth.dart`, etc. — `export` lines only.
+- A feature barrel exports only what other code needs (pages for the router, public providers). Don't export data-layer internals.
+- Import from outside the folder → through the barrel (`import 'package:weus/core/widgets/widgets.dart';`). Inside the same feature/folder → direct relative imports, never its own barrel (circular imports).
+- Never export generated `*.g.dart` / `*.freezed.dart` (they're `part` files).
+- When adding a public file, add its `export` to the barrel in the same change.
+
 ## Commands
 
 ```bash
