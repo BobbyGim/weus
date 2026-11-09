@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 
 /// Header + bottom nav around the tab branches of the shell route in router.dart.
 class AppShell extends StatelessWidget {
@@ -8,13 +8,13 @@ class AppShell extends StatelessWidget {
   final StatefulNavigationShell shell;
 
   static const _tabs = [
-    (label: '홈', icon: Icons.home_outlined, selected: Icons.home),
+    (label: "홈", icon: Icons.home_outlined, selected: Icons.home),
     (
-      label: '일정',
+      label: "일정",
       icon: Icons.calendar_month_outlined,
       selected: Icons.calendar_month,
     ),
-    (label: '마이페이지', icon: Icons.person_outline, selected: Icons.person),
+    (label: "마이페이지", icon: Icons.person_outline, selected: Icons.person),
   ];
 
   @override
@@ -22,7 +22,7 @@ class AppShell extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Image.asset('assets/image/header_logo.png', height: 28),
+        title: Image.asset("assets/image/header_logo.png", height: 28),
       ),
       body: shell,
       bottomNavigationBar: NavigationBar(

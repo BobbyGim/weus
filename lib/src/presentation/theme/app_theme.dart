@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
 final appTheme = ThemeData(
-  fontFamily: 'Pretendard',
+  fontFamily: "Pretendard",
   colorScheme: .fromSeed(seedColor: Colors.deepPurple),
 );

@@ -1,6 +1,6 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import "package:carousel_slider/carousel_slider.dart";
+import "package:flutter/widgets.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 
 const _sidePadding = 16.0;
 

@@ -1,3 +1,3 @@
-import 'main.dart';
+import "main.dart";
 
-void main() => bootstrap('prod');
+void main() => bootstrap("prod");
