@@ -1,6 +1,9 @@
-# Native splash = background only; the logo is drawn by SplashPage in Flutter.
 flutter_native_splash:
   color: "#111111"
+  image: assets/logo/splash_dark.png
+  branding: assets/logo/branding_dark.png
+  branding_bottom_padding: 48
   android_12:
     color: "#111111"
-    image: assets/logo/transparent.png # hide the system icon on Android 12+
+    image: assets/logo/splash_a12_dark.png
+    branding: assets/logo/branding_dark.png

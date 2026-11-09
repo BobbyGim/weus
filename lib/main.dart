@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'splash_page.dart';
+import 'router.dart';
 
 /// `flutter run --flavor x` (no -t) lands here and picks the env from the flavor.
 Future<void> main() => bootstrap(appFlavor ?? 'dev');
@@ -12,33 +12,21 @@ Future<void> main() => bootstrap(appFlavor ?? 'dev');
 Future<void> bootstrap(String flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env.$flavor');
-  runApp(MyApp(flavor: flavor));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key, required this.flavor});
-
-  final String flavor;
-
-  late final _router = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (_, _) => SplashPage(dark: flavor != 'prod'),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (_, _) => const MyHomePage(title: 'Flutter Demo Home Page'),
-      ),
-    ],
-  );
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       title: '위어스',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      routerConfig: _router,
+      theme: ThemeData(
+        fontFamily: 'Pretendard',
+        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+      ),
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }
