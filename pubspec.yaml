@@ -55,6 +55,7 @@ dependencies:
   google_fonts: ^9.0.0
   flutter_hooks: ^0.21.4
   hooks_riverpod: ^3.5.0
+  carousel_slider: ^5.1.2
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +84,8 @@ flutter:
     - .env.dev
     - .env.staging
     - .env.prod
+    - assets/image/
+    - assets/image/banner/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

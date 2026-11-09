@@ -50,3 +50,9 @@ app.*.map.json
 # Env (flavor별 .env.dev / .env.staging / .env.prod)
 .env*
 !.env.example
+
+# Generated code (run: dart run build_runner build -d)
+*.g.dart
+*.freezed.dart
+*.config.dart
+*.gen.dart

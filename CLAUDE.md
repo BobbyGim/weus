@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`weus` — Flutter app (Android/iOS only), Dart SDK ^3.13.5. Early stage: `lib/main.dart` (bootstrap, `MyApp`, template home page), `lib/router.dart`, and `main_<flavor>.dart` entry files.
+`weus` — Flutter app (Android/iOS only), Dart SDK ^3.13.5. Early stage: `lib/main.dart` (bootstrap, `MyApp`), `lib/src/` (router, domain, data, presentation), and `main_<flavor>.dart` entry files.
 
-- Routing: `go_router`, exposed as `routerProvider` (`@Riverpod(keepAlive: true)`) in `lib/router.dart`; `MyApp` is a `ConsumerWidget` that watches it. Add routes there. `/` is the home page; no Flutter splash route.
+- Routing: `go_router`, exposed as `routerProvider` (`@Riverpod(keepAlive: true)`) in `lib/src/router.dart`; `MyApp` is a `ConsumerWidget` that watches it. Add routes there. `/` is the home page; no Flutter splash route.
 - Hooks: `flutter_hooks` + `hooks_riverpod`. Import `package:hooks_riverpod/hooks_riverpod.dart` (re-exports flutter_riverpod; `flutter_riverpod` is not a direct dependency). Widgets needing `ref` + local state (controllers, animations, focus nodes) → `HookConsumerWidget` with `useTextEditingController()` etc. instead of `ConsumerStatefulWidget`; `ref` only → `ConsumerWidget`; neither → `StatelessWidget`. Shared state stays in providers, not hooks.
-- State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. Generated `*.g.dart` files are committed. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
+- State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. Generated files (`*.g.dart`, `*.freezed.dart`, `*.config.dart`, `*.gen.dart`) are gitignored — after a fresh clone or pull, run `dart run build_runner build -d` before building. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
 - Models: `freezed` + `json_serializable`.
 - After changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, regenerate: `dart run build_runner build -d` (or `watch -d`).
 - Font: Pretendard (400/500/600/700/800/900, `assets/fonts/`, OFL license alongside) is the theme default via `ThemeData(fontFamily: 'Pretendard')`. Other weights fall back to synthesized ones.
@@ -31,53 +31,75 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Splash is native only (no Flutter splash page): logo `splash_<light|dark>.png` (@4x, 180pt) + bottom wordmark `branding_<light|dark>.png` ("WeUs"); Android 12 uses `splash_a12_*.png` (1152px, logo kept inside the icon circle). If startup work is added (e.g. auth check), keep the native splash up with `FlutterNativeSplash.preserve()` / `remove()` instead of adding a splash route, so deep links land directly on their page.
 - Android `compileSdk = 37` (required by `permission_handler`); `android.suppressUnsupportedCompileSdk=37` silences the AGP warning.
 
-## Architecture (feature-first clean architecture)
+## Architecture (layer-first clean architecture, pages split under presentation)
 
 ```
 lib/
-├── core/                 # shared: widgets/, theme/, extensions/, utils/, network/, error/
-└── features/<feature>/
-    ├── domain/           # entities, repository interfaces (pure Dart, no Flutter/data imports)
-    ├── data/             # DTOs, datasources, repository impls
+├── main.dart, main_<flavor>.dart   # bootstrap + flavor entries
+└── src/
+    ├── router.dart                 # routerProvider
+    ├── domain/                     # shared by every page; pure Dart, no Flutter/data imports
+    │   ├── domain.dart             # barrel
+    │   ├── entities/               # (add when needed)
+    │   └── repositories/           # repository interfaces (<name>_repository.dart)
+    ├── data/                       # shared; DTOs, datasources, repository impls + their providers
+    │   ├── data.dart               # barrel
+    │   └── repositories/           # <name>_repository_impl.dart
     └── presentation/
-        ├── view_models/  # @riverpod Notifier/AsyncNotifier classes (<name>_view_model.dart)
-        ├── hooks/        # custom hooks (use_<name>.dart), one per file
-        ├── pages/        # screens (<name>_page.dart, class <Name>Page), routed from router.dart
-        └── widgets/      # feature-only components
+        ├── theme/                  # app theme (barrel theme.dart)
+        ├── widgets/                # widgets used by 2+ pages (barrel widgets.dart)
+        ├── hooks/                  # hooks used by 2+ pages (barrel hooks.dart, add when needed)
+        └── pages/
+            ├── pages.dart          # barrel: exports each <page>_page.dart for the router
+            └── <page>/             # one folder per page (home/, my/ …)
+                ├── <page>_page.dart        # class <Page>Page, routed from router.dart
+                ├── view_models/            # <page>_view_model.dart
+                ├── hooks/                  # use_<page>_page.dart, hooks of the page itself
+                └── widgets/                # widgets used only by this page
+                    └── hooks/              # use_<widget>.dart, hooks of those widgets
 ```
+
+- No `features/` or `core/` folders. Domain and data are app-wide, not per page.
+- Dependency direction: presentation → domain ← data (ViewModels may read repository providers from `data/`). `domain/` imports nothing from `data/` or `presentation/`.
+- Pages never import each other's files. A widget/hook needed by a second page → move it to `presentation/widgets/` or `presentation/hooks/`.
 
 ### Naming
 
-- Screens are **pages**, never "views": folder `pages/`, file `<name>_page.dart`, class `<Name>Page` (`LoginPage`, not `LoginView`/`LoginScreen`). `ViewModel` keeps its name (MVVM term).
+- Screens are **pages**, never "views": `pages/<page>/<page>_page.dart`, class `<Name>Page` (`LoginPage`, not `LoginView`/`LoginScreen`). `ViewModel` keeps its name (MVVM term).
 
 ### Custom hooks
 
-- Custom hooks always get their own file in `features/<feature>/presentation/hooks/`, never inline in a page/widget file.
-- Hook for a single page/widget → named after it: `Example` → `useExample()` in `use_example.dart`.
-- Used by a second feature → move to `core/hooks/` and export from `core/hooks/hooks.dart`.
-- No `widgets/hooks/` subfolders — hooks are placed by sharing scope, not by whether a page or widget calls them.
-- Built-in `flutter_hooks` hooks (`useTextEditingController`, `useState`…) are called directly in `build()`; don't wrap them.
+- A Page/widget's UI logic (local state, derived values, callbacks, package config objects like `CarouselOptions`) goes into its custom hook; the widget calls the hook once and only renders. Return several values as a named record, e.g. `({int current, CarouselOptions options})`. Need `context` inside a hook → `useContext()`.
+- Custom hooks always get their own file, never inline in a page/widget file. Named after the page/widget that calls it: `Example` → `useExample()` in `use_example.dart`.
+- Page's hook → `pages/<page>/hooks/`. Widget's hook → the `hooks/` folder next to that widget (`pages/<page>/widgets/hooks/`, or `presentation/widgets/hooks/` for shared widgets).
+- Controllers a widget uses (`CarouselSliderController`, `PageController`, `ScrollController`, `TabController`…) are created and owned in that widget's hook (`useMemoized(X.new)` / `usePageController()`…) and returned in its record — never created in `build()` or passed down from the page.
+- A hook used by a second page → move to `presentation/hooks/` and export from `presentation/hooks/hooks.dart`.
+- Built-in `flutter_hooks` hooks (`useTextEditingController`, `useState`…) are called inside the widget's custom hook. Don't write a custom hook that only renames a single built-in one.
 
 ### MVVM (presentation layer)
 
-- **Model** = `domain/` + `data/`. **ViewModel** = `presentation/view_models/`. **View** = `presentation/pages/` + `widgets/`.
+- **Model** = `domain/` + `data/`. **ViewModel** = `pages/<page>/view_models/`. **View** = `pages/<page>/<page>_page.dart` + its `widgets/`.
 - One ViewModel per screen: `LoginViewModel` (`@riverpod class LoginViewModel extends _$LoginViewModel`) ↔ `LoginPage`. Its state is a `@freezed` `LoginState` in the same file, or `AsyncValue<T>` when it's just loading one thing.
 - ViewModel: holds screen state, exposes intent methods (`signIn()`, `refresh()`), calls repositories via `ref.read(xRepositoryProvider)`. No `BuildContext`, no widgets, no `material.dart` import.
 - Page: `ref.watch(loginViewModelProvider)` to render, `ref.read(loginViewModelProvider.notifier).signIn(...)` on events. No business logic, no repository calls. Navigation/snackbars/dialogs stay in the Page (react with `ref.listen`).
 - Ephemeral UI-only state (text controllers, animation, focus, a toggle that nothing else reads) → hooks in the Page/widget, not the ViewModel.
-- A ViewModel never watches another screen's ViewModel. State shared by several screens → a separate provider in `presentation/` (or a repository-backed provider), watched by each ViewModel.
-
-- Dependency direction: presentation → domain ← data. `features/*` → `core`; `core` never imports `features`. Features never import each other — move the shared piece to `core/` instead.
-- A widget used by one feature stays in that feature's `presentation/widgets/`; move it to `core/widgets/` only once a second feature needs it.
+- A ViewModel never watches another screen's ViewModel. State shared by several screens → a separate provider (repository-backed in `data/`, or under `presentation/`), watched by each ViewModel.
 - DI via Riverpod providers (no get_it). UseCases and separate Entity/DTO are optional — add them only when there's real logic or the shapes diverge.
 
 ### Barrel files
 
-- Each `core/` subfolder and each feature has one barrel: `core/widgets/widgets.dart`, `features/auth/auth.dart`, etc. — `export` lines only.
-- A feature barrel exports only what other code needs (pages for the router, providers other features read). Don't export data-layer internals.
-- Import from outside the folder → through the barrel (`import 'package:weus/core/widgets/widgets.dart';`). Inside the same feature/folder → direct relative imports, never its own barrel (circular imports).
+- Barrels: `domain/domain.dart`, `data/data.dart`, `presentation/theme/theme.dart`, `presentation/widgets/widgets.dart`, `presentation/hooks/hooks.dart`, `presentation/pages/pages.dart` — `export` lines only.
+- `pages.dart` exports only the `<page>_page.dart` files (for the router); a page's view models, hooks and widgets stay private to it.
+- Import from outside the folder → through the barrel with a package import (`import 'package:weus/src/domain/domain.dart';`). Inside the same folder/page → direct relative imports, never its own barrel (circular imports).
 - Never export generated `*.g.dart` / `*.freezed.dart` (they're `part` files).
 - When adding a public file, add its `export` to the barrel in the same change.
+
+### Code style
+
+- Put one blank line between sibling code blocks so the code is easy to scan:
+  - between statements in a function body (`final a = …;` ↵ blank ↵ `final b = …;` ↵ blank ↵ `return …;`)
+  - between sibling widgets in `children:` / `items:` / `branches:` lists
+- Keep a widget's own named arguments (`padding:`, `child:` …) together without blank lines. `dart format` keeps the blank lines.
 
 ## Commands
 
