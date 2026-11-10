@@ -64,7 +64,7 @@ class SchedulePage extends HookWidget {
           // Every day cell is ours: number on top, schedule titles under.
           prioritizedBuilder: (context, day, _) => ScheduleDayCell(
             day: day,
-            titles: [for (final s in schedule.schedulesOn(day)) s.title],
+            labels: schedule.labelsOn(day),
             isToday: isSameDay(day, schedule.today),
             isSelected: isSameDay(day, schedule.selectedDay),
           ),
