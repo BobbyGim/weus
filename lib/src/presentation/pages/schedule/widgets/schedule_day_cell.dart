@@ -41,7 +41,7 @@ class ScheduleDayCell extends StatelessWidget {
     final dayColor = switch (day.weekday) {
       _ when isToday => scheme.primary,
       DateTime.sunday => scheme.error,
-      DateTime.saturday => scheme.primary,
+      DateTime.saturday => scheme.tertiary,
       _ => scheme.onSurface,
     };
 
