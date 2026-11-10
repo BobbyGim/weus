@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 
+import "widgets/design_showcase.dart";
 import "widgets/home_banner_carousel.dart";
 
 class HomePage extends StatelessWidget {
@@ -7,18 +8,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Column(
-        children: [
+    return Scaffold(
+      body: ListView(
+        children: const [
           SizedBox(height: 8),
 
           HomeBannerCarousel(),
 
-          SizedBox(height: 8),
-
-          Text("홈페이지"),
-
-          Text("홈페이지"),
+          DesignShowcase(),
         ],
       ),
     );

@@ -39,15 +39,18 @@ android {
             dimension = "env"
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "위어스 dev")
+            manifestPlaceholders["appScheme"] = "weus-dev"
         }
         create("staging") {
             dimension = "env"
             applicationIdSuffix = ".staging"
             resValue("string", "app_name", "위어스 stg")
+            manifestPlaceholders["appScheme"] = "weus-staging"
         }
         create("prod") {
             dimension = "env"
             resValue("string", "app_name", "위어스")
+            manifestPlaceholders["appScheme"] = "weus"
         }
     }
 

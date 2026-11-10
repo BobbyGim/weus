@@ -27,8 +27,6 @@ class AppShell extends StatelessWidget {
       body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
-        indicatorColor: Colors.transparent,
-        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         // Re-tapping the current tab pops it back to its root.
         onDestinationSelected: (i) =>
             shell.goBranch(i, initialLocation: i == shell.currentIndex),
