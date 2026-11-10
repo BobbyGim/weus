@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:intl/date_symbol_data_local.dart";
 
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/router.dart";
@@ -14,6 +15,9 @@ Future<void> bootstrap(String flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env.$flavor");
+
+  // Korean month/weekday names for DateFormat (the schedule calendar).
+  await initializeDateFormatting("ko_KR");
 
   runApp(const ProviderScope(child: MyApp()));
 }
