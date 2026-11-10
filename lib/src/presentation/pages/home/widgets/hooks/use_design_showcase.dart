@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:weus/src/presentation/widgets/widgets.dart";
 
 const showcaseChips = ["전체", "예배", "소그룹", "봉사", "행사"];
 
@@ -9,6 +10,10 @@ const showcaseChips = ["전체", "예배", "소그룹", "봉사", "행사"];
   TextEditingController nameController,
   String? nameError,
   VoidCallback showSnackBar,
+  VoidCallback showSuccess,
+  VoidCallback showFailure,
+  VoidCallback showInfo,
+  VoidCallback showTop,
   VoidCallback showSheet,
   VoidCallback showConfirmDialog,
 })
@@ -26,9 +31,26 @@ useDesignShowcase() {
       ? "이름은 2자 이상 입력해 주세요"
       : null;
 
-  void showSnackBar() => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(const SnackBar(content: Text("일정이 저장되었어요")));
+  void showSnackBar() => showAppSnackBar(context, "일정이 저장되었어요");
+
+  void showSuccess() =>
+      showAppSnackBar(context, "일정이 등록되었어요", icon: Icons.check_circle_outline);
+
+  void showFailure() => showAppSnackBar(
+    context,
+    "일정을 등록하지 못했어요. 다시 시도해 주세요",
+    icon: Icons.error_outline,
+  );
+
+  void showInfo() =>
+      showAppSnackBar(context, "모임 시작 10분 전에 알려드릴게요", icon: Icons.info_outline);
+
+  void showTop() => showAppSnackBar(
+    context,
+    "위쪽에 뜨는 스낵바예요",
+    icon: Icons.arrow_upward,
+    top: true,
+  );
 
   // Root navigator: the tab's own navigator sits under the bottom nav.
   void showSheet() => showModalBottomSheet<void>(
@@ -88,6 +110,10 @@ useDesignShowcase() {
     nameController: nameController,
     nameError: nameError,
     showSnackBar: showSnackBar,
+    showSuccess: showSuccess,
+    showFailure: showFailure,
+    showInfo: showInfo,
+    showTop: showTop,
     showSheet: showSheet,
     showConfirmDialog: showConfirmDialog,
   );

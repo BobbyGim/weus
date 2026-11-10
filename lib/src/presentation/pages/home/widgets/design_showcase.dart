@@ -252,6 +252,59 @@ class DesignShowcase extends HookWidget {
             ],
           ),
 
+          const _Section("Snackbar"),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: showcase.showSuccess,
+                  child: const Text("성공"),
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.sm),
+
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: showcase.showFailure,
+                  child: const Text("실패"),
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.sm),
+
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: showcase.showInfo,
+                  child: const Text("안내"),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: showcase.showSnackBar,
+                  child: const Text("아이콘 없이"),
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.sm),
+
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: showcase.showTop,
+                  child: const Text("위쪽에 띄우기"),
+                ),
+              ),
+            ],
+          ),
+
           const SizedBox(height: AppSpacing.xxxl),
         ],
       ),
