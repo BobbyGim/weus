@@ -113,7 +113,9 @@ final _inputBorder = OutlineInputBorder(
   borderSide: .none,
 );
 
-final appTheme = ThemeData(
+// A getter, not a `final`: a top-level final is built once, so hot reload
+// would keep showing the old theme until a full restart.
+ThemeData get appTheme => ThemeData(
   fontFamily: "Pretendard",
   colorScheme: _scheme,
   textTheme: _textTheme,

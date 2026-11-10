@@ -1,13 +1,16 @@
 import "package:flutter/material.dart";
 
-/// Brand palette, taken from the banners and logo.
-/// Primary blue is the only accent; ink (secondary) carries everything else.
+/// Brand palette. Primary teal is the main accent; ink (secondary) carries
+/// everything else; tertiary blue is a rare second accent.
 abstract final class AppColors {
-  static const primary = Color(0xFF2F6BFF);
+  static const primary = Color(0xFF0F766E);
 
-  static const primaryPressed = Color(0xFF1F4FD1);
+  static const primaryPressed = Color(0xFF0B5C56);
 
-  static const primarySoft = Color(0xFFD6E2FF);
+  static const primarySoft = Color(0xFFD5F0EC);
+
+  /// Second accent, blue. Used sparingly (e.g. Saturdays in the calendar).
+  static const tertiary = Color(0xFF2F6BFF);
 
   static const ink = Color(0xFF161718);
 
@@ -35,11 +38,13 @@ const appColorScheme = ColorScheme(
   primary: AppColors.primary,
   onPrimary: Colors.white,
   primaryContainer: AppColors.primarySoft,
-  onPrimaryContainer: Color(0xFF0B2A7A),
+  onPrimaryContainer: Color(0xFF083F3A),
   secondary: AppColors.ink,
   onSecondary: AppColors.paper,
   secondaryContainer: AppColors.gray150,
   onSecondaryContainer: AppColors.ink,
+  tertiary: AppColors.tertiary,
+  onTertiary: Colors.white,
   error: AppColors.error,
   onError: Colors.white,
   errorContainer: Color(0xFFFFE5E5),
@@ -56,7 +61,7 @@ const appColorScheme = ColorScheme(
   outlineVariant: AppColors.gray200,
   inverseSurface: AppColors.ink,
   onInverseSurface: AppColors.gray100,
-  inversePrimary: Color(0xFF8FB0FF),
+  inversePrimary: Color(0xFF7FD4C8),
   // No M3 elevation tint: surfaces stay neutral gray.
   surfaceTint: Colors.transparent,
 );

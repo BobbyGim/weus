@@ -58,7 +58,7 @@ class SchedulePage extends HookWidget {
               : Center(
                   child: Text(
                     DateFormat.E("ko_KR").format(day),
-                    style: weekdayStyle.copyWith(color: scheme.primary),
+                    style: weekdayStyle.copyWith(color: scheme.tertiary),
                   ),
                 ),
           // Every day cell is ours: number on top, schedule titles under.
