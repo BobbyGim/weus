@@ -4,6 +4,8 @@ import "package:intl/intl.dart";
 
 import "package:weus/src/domain/domain.dart";
 
+import "../schedule_range_dialog.dart";
+
 /// Form state of the registration sheet. The period starts as today to today
 /// (KST); the schedule can be saved once it has a title.
 ({
@@ -38,25 +40,16 @@ useScheduleAddSheet() {
   ).format(day);
 
   Future<void> pickDates() async {
-    final range = await showDateRangePicker(
+    final range = await showDialog<({DateTime start, DateTime end})>(
       context: context,
-      // Same span as the calendar.
-      firstDate: DateTime.utc(2020),
-      lastDate: DateTime.utc(2035, 12, 31),
-      currentDate: today,
-      initialDateRange: DateTimeRange(start: start.value, end: end.value),
-      helpText: "기간 선택",
-      saveText: "확인",
+      builder: (_) => ScheduleRangeDialog(start: start.value, end: end.value),
     );
 
     if (range == null) return;
 
-    // The picker answers in local time; schedules are UTC-midnight dates.
-    DateTime utc(DateTime d) => DateTime.utc(d.year, d.month, d.day);
+    start.value = range.start;
 
-    start.value = utc(range.start);
-
-    end.value = utc(range.end);
+    end.value = range.end;
   }
 
   return (

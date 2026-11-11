@@ -26,7 +26,7 @@ class ScheduleAddButton extends StatelessWidget {
 
         showModalBottomSheet<void>(
           context: root.context,
-          // Lets the sheet grow with its form and move above the keyboard.
+          // Lets ScheduleAddSheet set its own height (90% of the screen).
           isScrollControlled: true,
           builder: (_) => const ScheduleAddSheet(),
         );
