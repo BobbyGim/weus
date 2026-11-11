@@ -1,3 +1,4 @@
+import "package:flutter/cupertino.dart";
 import "package:go_router/go_router.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -28,6 +29,23 @@ GoRouter router(Ref ref) => GoRouter(
           routes: [GoRoute(path: "/mypage", builder: (_, _) => const MyPage())],
         ),
       ],
+    ),
+
+    // Outside the shell: full screens pushed over the tabs (no header/nav).
+    // Open them with context.push so back returns to the tab. CupertinoPage
+    // slides in from the right and keeps the iOS edge swipe back.
+    GoRoute(
+      path: "/mypage/info",
+      pageBuilder: (_, state) =>
+          CupertinoPage(key: state.pageKey, child: const MyInfoPage()),
+    ),
+
+    GoRoute(
+      path: "/mypage/notifications",
+      pageBuilder: (_, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const NotificationSettingsPage(),
+      ),
     ),
   ],
 );

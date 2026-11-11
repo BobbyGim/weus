@@ -37,6 +37,15 @@
       "flutterMode": "release",
       "program": "lib/main_prod.dart",
       "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "dev (김정현의 iPhone)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "deviceId": "00008120-00121D0A3E87A01E",
+      "program": "lib/main_dev.dart",
+      "args": ["--flavor", "dev"]
     }
   ]
 }

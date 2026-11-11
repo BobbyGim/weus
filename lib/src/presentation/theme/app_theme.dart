@@ -1,3 +1,4 @@
+import "package:flutter/cupertino.dart" show CupertinoPageTransitionsBuilder;
 import "package:flutter/material.dart";
 
 import "app_colors.dart";
@@ -120,6 +121,14 @@ ThemeData get appTheme => ThemeData(
   colorScheme: _scheme,
   textTheme: _textTheme,
   scaffoldBackgroundColor: _scheme.surface,
+
+  // Android slides pages in from the side too, like iOS.
+  pageTransitionsTheme: const PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    },
+  ),
 
   appBarTheme: AppBarTheme(
     backgroundColor: _scheme.surface,
