@@ -1,19 +1,21 @@
 import "package:flutter/material.dart";
-import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:intl/intl.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:table_calendar/table_calendar.dart";
+import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 import "hooks/use_schedule_page.dart";
 import "widgets/schedule_add_button.dart";
 import "widgets/schedule_day_cell.dart";
 
-class SchedulePage extends HookWidget {
+class SchedulePage extends HookConsumerWidget {
   const SchedulePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final schedule = useSchedulePage();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final schedule = useSchedulePage(ref.watch(schedulesProvider));
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -42,8 +44,14 @@ class SchedulePage extends HookWidget {
         headerStyle: HeaderStyle(
           titleCentered: true,
           titleTextStyle: text.titleLarge!,
-          leftChevronIcon: Icon(Icons.chevron_left, color: scheme.onSurface),
-          rightChevronIcon: Icon(Icons.chevron_right, color: scheme.onSurface),
+          leftChevronIcon: Icon(
+            LucideIcons.chevronLeft,
+            color: scheme.onSurface,
+          ),
+          rightChevronIcon: Icon(
+            LucideIcons.chevronRight,
+            color: scheme.onSurface,
+          ),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: weekdayStyle,

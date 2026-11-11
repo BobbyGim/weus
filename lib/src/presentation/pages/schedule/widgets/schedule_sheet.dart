@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:intl/intl.dart";
-
+import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 import "hooks/use_schedule_sheet.dart";
@@ -37,7 +37,7 @@ class ScheduleSheet extends HookWidget {
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Icon(
-        Icons.keyboard_arrow_down,
+        LucideIcons.chevronDown,
         size: 22,
         color: scheme.onSurfaceVariant,
       ),
@@ -83,7 +83,7 @@ class ScheduleSheet extends HookWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(
-                            Icons.event_busy_outlined,
+                            LucideIcons.calendarX,
                             size: 48,
                             color: AppColors.gray300,
                           ),

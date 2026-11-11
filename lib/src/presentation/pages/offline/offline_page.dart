@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 
 import "package:weus/src/presentation/theme/theme.dart";
 
@@ -33,7 +34,7 @@ class OfflinePage extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.wifi_off_rounded,
+                        LucideIcons.wifiOff,
                         size: 40,
                         color: scheme.onSurfaceVariant,
                       ),

@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
 const showcaseChips = ["전체", "예배", "소그룹", "봉사", "행사"];
@@ -34,21 +35,21 @@ useDesignShowcase() {
   void showSnackBar() => showAppSnackBar(context, "일정이 저장되었어요");
 
   void showSuccess() =>
-      showAppSnackBar(context, "일정이 등록되었어요", icon: Icons.check_circle_outline);
+      showAppSnackBar(context, "일정이 등록되었어요", icon: LucideIcons.circleCheck);
 
   void showFailure() => showAppSnackBar(
     context,
     "일정을 등록하지 못했어요. 다시 시도해 주세요",
-    icon: Icons.error_outline,
+    icon: LucideIcons.circleAlert,
   );
 
   void showInfo() =>
-      showAppSnackBar(context, "모임 시작 10분 전에 알려드릴게요", icon: Icons.info_outline);
+      showAppSnackBar(context, "모임 시작 10분 전에 알려드릴게요", icon: LucideIcons.info);
 
   void showTop() => showAppSnackBar(
     context,
     "위쪽에 뜨는 스낵바예요",
-    icon: Icons.arrow_upward,
+    icon: LucideIcons.arrowUp,
     top: true,
   );
 

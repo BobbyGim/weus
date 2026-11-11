@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 import "hooks/use_design_showcase.dart";
@@ -186,7 +187,7 @@ class DesignShowcase extends HookWidget {
                       borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Icon(
-                      Icons.event_outlined,
+                      LucideIcons.calendar,
                       color: scheme.onPrimaryContainer,
                     ),
                   ),
@@ -211,7 +212,7 @@ class DesignShowcase extends HookWidget {
                     ),
                   ),
 
-                  Icon(Icons.chevron_right, color: scheme.outline),
+                  Icon(LucideIcons.chevronRight, color: scheme.outline),
                 ],
               ),
             ),

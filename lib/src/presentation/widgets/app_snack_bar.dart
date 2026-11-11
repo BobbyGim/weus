@@ -8,7 +8,7 @@ OverlayEntry? _topEntry;
 /// Shows [message] in the app's snackbar, replacing one that is already up.
 /// Its look (floating, ink background, 12 radius) comes from `snackBarTheme`.
 ///
-/// [icon] (e.g. `Icons.check_circle_outline`) goes left of the message.
+/// [icon] (e.g. `LucideIcons.circleCheck`) goes left of the message.
 /// [top] shows it under the status bar instead of at the bottom.
 void showAppSnackBar(
   BuildContext context,

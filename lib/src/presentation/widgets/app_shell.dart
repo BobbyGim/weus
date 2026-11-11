@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 
 /// Header + bottom nav around the tab branches of the shell route in router.dart.
 class AppShell extends StatelessWidget {
@@ -8,13 +9,9 @@ class AppShell extends StatelessWidget {
   final StatefulNavigationShell shell;
 
   static const _tabs = [
-    (label: "홈", icon: Icons.home_outlined, selected: Icons.home),
-    (
-      label: "일정",
-      icon: Icons.calendar_month_outlined,
-      selected: Icons.calendar_month,
-    ),
-    (label: "마이페이지", icon: Icons.person_outline, selected: Icons.person),
+    (label: "홈", icon: LucideIcons.house),
+    (label: "일정", icon: LucideIcons.calendarDays),
+    (label: "마이페이지", icon: LucideIcons.user),
   ];
 
   @override
@@ -32,11 +29,9 @@ class AppShell extends StatelessWidget {
             shell.goBranch(i, initialLocation: i == shell.currentIndex),
         destinations: [
           for (final t in _tabs)
-            NavigationDestination(
-              icon: Icon(t.icon),
-              selectedIcon: Icon(t.selected),
-              label: t.label,
-            ),
+            // Lucide has no filled variant: the selected tab differs by
+            // color only (navigationBarTheme).
+            NavigationDestination(icon: Icon(t.icon), label: t.label),
         ],
       ),
     );

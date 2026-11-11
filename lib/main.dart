@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
+import "package:flutter_localizations/flutter_localizations.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:intl/date_symbol_data_local.dart";
 
@@ -35,6 +36,9 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: "위어스",
       theme: appTheme,
+      // Korean only: Material's own texts (date picker, tooltips) follow it.
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: const [Locale("ko", "KR")],
       routerConfig: ref.watch(routerProvider),
       // The router stays mounted under the offline page, so reconnecting
       // lands back on the same screen with its state.

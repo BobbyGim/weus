@@ -1,7 +1,10 @@
 import "package:flutter/material.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 
-/// Floating "+" for registering a schedule, on the calendar and in the day
-/// sheet.
+import "schedule_add_sheet.dart";
+
+/// Floating "+" that opens the schedule registration sheet, on the calendar
+/// and in the day sheet.
 class ScheduleAddButton extends StatelessWidget {
   const ScheduleAddButton({super.key});
 
@@ -13,13 +16,26 @@ class ScheduleAddButton extends StatelessWidget {
       // No Hero: the page and the sheet each show one at the same time.
       heroTag: null,
       tooltip: "일정 등록",
-      // shortcut: no registration form yet, wire it here once it exists.
-      onPressed: () {},
+      onPressed: () {
+        // Over the bottom nav too; its context outlives the day sheet.
+        final root = Navigator.of(context, rootNavigator: true);
+
+        // In the day sheet: close it first, its list would be out of date
+        // after a save.
+        if (ModalRoute.of(context) is PopupRoute) root.pop();
+
+        showModalBottomSheet<void>(
+          context: root.context,
+          // Lets the sheet grow with its form and move above the keyboard.
+          isScrollControlled: true,
+          builder: (_) => const ScheduleAddSheet(),
+        );
+      },
       backgroundColor: scheme.primary,
       foregroundColor: scheme.onPrimary,
       elevation: 2,
       shape: const CircleBorder(),
-      child: const Icon(Icons.add),
+      child: const Icon(LucideIcons.plus),
     );
   }
 }

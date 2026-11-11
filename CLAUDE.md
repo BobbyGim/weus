@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. Generated files (`*.g.dart`, `*.freezed.dart`, `*.config.dart`, `*.gen.dart`) are gitignored — after a fresh clone or pull, run `dart run build_runner build -d` before building. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
 - Models: `freezed` + `json_serializable`.
 - After changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, regenerate: `dart run build_runner build -d` (or `watch -d`).
+- Icons: Lucide only (`lucide_icons_flutter`, `import "package:lucide_icons_flutter/lucide_icons.dart";` → `Icon(LucideIcons.calendarDays)`). Never Material `Icons.*` / `CupertinoIcons.*`, and no Material icon widgets (`CloseButton`, `BackButton` → `IconButton` with a Lucide icon). Lucide has no filled variants: show selected/active state with color, not a second icon.
 - Font: Pretendard (400/500/600/700/800/900, `assets/fonts/`, OFL license alongside) is the theme default via `ThemeData(fontFamily: 'Pretendard')`. Other weights fall back to synthesized ones.
 - Lints: `flutter_lints` via `analysis_options.yaml`; `android/` and `ios/` are excluded from analysis.
 
