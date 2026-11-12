@@ -42,7 +42,7 @@ class MyPage extends StatelessWidget {
         MyProfileCard(
           name: "위어스",
           email: "weus@example.com",
-          onTap: () => context.push("/mypage/info"),
+          onTap: () => context.go("/mypage/info"),
         ),
 
         for (final s in _sections) ...[
@@ -70,7 +70,7 @@ class MyPage extends StatelessWidget {
                     icon: m.icon,
                     label: m.label,
                     onTap: () {
-                      if (m.path case final path?) context.push(path);
+                      if (m.path case final path?) context.go(path);
                     },
                   ),
                 ],
