@@ -26,6 +26,12 @@ GoRouter router(Ref ref) => GoRouter(
         ),
 
         StatefulShellBranch(
+          routes: [
+            GoRoute(path: "/meeting", builder: (_, _) => const MeetingPage()),
+          ],
+        ),
+
+        StatefulShellBranch(
           routes: [GoRoute(path: "/mypage", builder: (_, _) => const MyPage())],
         ),
       ],

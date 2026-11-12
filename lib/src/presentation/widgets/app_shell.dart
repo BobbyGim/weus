@@ -11,6 +11,7 @@ class AppShell extends StatelessWidget {
   static const _tabs = [
     (label: "홈", icon: LucideIcons.house),
     (label: "일정", icon: LucideIcons.calendarDays),
+    (label: "모임", icon: LucideIcons.users),
     (label: "마이페이지", icon: LucideIcons.user),
   ];
 
