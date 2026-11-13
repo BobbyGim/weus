@@ -9,6 +9,12 @@ android {
     compileSdk = 37 // permission_handler requires 37+
     ndkVersion = flutter.ndkVersion
 
+    // The default pattern also drops every dotfile, so .env.<flavor> never
+    // reaches the APK; this is the default without its ".*" rule.
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

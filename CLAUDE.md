@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`weus` — Flutter app (Android/iOS only), Dart SDK ^3.13.5. Early stage: `lib/main.dart` (bootstrap, `MyApp`), `lib/src/` (router, domain, data, presentation), and `main_<flavor>.dart` entry files.
+`weus` — Flutter app (Android/iOS only), Flutter 3.50, Dart SDK ^3.14.0. Early stage: `lib/main.dart` (bootstrap, `MyApp`), `lib/src/` (router, domain, data, presentation), and `main_<flavor>.dart` entry files.
 
 - Routing: `go_router`, exposed as `routerProvider` (`@Riverpod(keepAlive: true)`) in `lib/src/router.dart`; `MyApp` is a `ConsumerWidget` that watches it. Tabs (`/`, `/schedule`, `/meeting`, `/mypage`) are the branches of a `StatefulShellRoute.indexedStack` (`AppShell`, header + bottom nav), so each tab keeps its state; full-screen pages are child routes of their tab (`/mypage/info` under `/mypage`) with `parentNavigatorKey: rootKey` (covers the header/nav) and `pageBuilder` → `CupertinoPage` (slide + iOS swipe back), each written out, no helper, and are opened with `context.go`, so a deep link stacks them on their tab too (while the app is not on screen yet — cold start or returning from the background — the router `redirect` opens the tab first, then slides the page in once the app is visible). Add routes there. `/` is the home page; no Flutter splash route.
 - Hooks: `flutter_hooks` + `hooks_riverpod`. Import `package:hooks_riverpod/hooks_riverpod.dart` (re-exports flutter_riverpod; `flutter_riverpod` is not a direct dependency). Widgets needing `ref` + local state (controllers, animations, focus nodes) → `HookConsumerWidget` with `useTextEditingController()` etc. instead of `ConsumerStatefulWidget`; `ref` only → `ConsumerWidget`; neither → `StatelessWidget`. Shared state stays in providers, not hooks.
@@ -46,6 +46,9 @@ lib/
     │   └── repositories/           # repository interfaces (<name>_repository.dart)
     ├── data/                       # shared; DTOs, datasources, repository impls + their providers
     │   ├── data.dart               # barrel
+    │   ├── database/               # drift AppDatabase (app_database.dart): tables + appDatabaseProvider
+    │   ├── network/                # dio (dio_client.dart + dioProvider) — add when needed
+    │   ├── supabase/               # supabase (supabase_client.dart + supabaseClientProvider) — add when needed
     │   └── repositories/           # <name>_repository_impl.dart
     └── presentation/
         ├── theme/                  # app theme (barrel theme.dart)
@@ -62,6 +65,7 @@ lib/
 ```
 
 - No `features/` or `core/` folders. Domain and data are app-wide, not per page.
+- Data sources: each client (`AppDatabase`, `Dio`, `SupabaseClient`) lives in its own `data/` folder with its provider in the same file; there is no `providers/` folder. Only repository impls use them (a repository may combine several, e.g. local DB + Supabase); pages and ViewModels see just the `domain/` repository interface. One-time init (`Supabase.initialize`) goes in `bootstrap()`, URLs/keys come from `.env.<flavor>` (public values only).
 - Dependency direction: presentation → domain ← data (ViewModels may read repository providers from `data/`). `domain/` imports nothing from `data/` or `presentation/`.
 - Pages never import each other's files. A widget/hook needed by a second page → move it to `presentation/widgets/` or `presentation/hooks/`.
 
