@@ -46,7 +46,7 @@ lib/
     │   └── repositories/           # repository interfaces (<name>_repository.dart)
     ├── data/                       # shared; DTOs, datasources, repository impls + their providers
     │   ├── data.dart               # barrel
-    │   ├── database/               # drift AppDatabase (app_database.dart): tables + appDatabaseProvider
+    │   ├── database/               # drift AppDatabase + appDatabaseProvider (app_database.dart); tables/<name>_rows.dart, one table each
     │   ├── network/                # dio (dio_client.dart + dioProvider) — add when needed
     │   ├── supabase/               # supabase (supabase_client.dart + supabaseClientProvider) — add when needed
     │   └── repositories/           # <name>_repository_impl.dart
