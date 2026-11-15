@@ -40,6 +40,8 @@ lib/
 ├── main.dart, main_<flavor>.dart   # bootstrap + flavor entries
 └── src/
     ├── router.dart                 # routerProvider
+    ├── utils/                      # pure-Dart helpers any layer may use (barrel utils.dart)
+    │   └── format/                 # date/text formatting (format_kst_today.dart …)
     ├── domain/                     # shared by every page; pure Dart, no Flutter/data imports
     │   ├── domain.dart             # barrel
     │   ├── entities/               # (add when needed)
@@ -64,7 +66,8 @@ lib/
                     └── hooks/              # use_<widget>.dart, hooks of those widgets
 ```
 
-- No `features/` or `core/` folders. Domain and data are app-wide, not per page.
+- No `features/` folders. Domain and data are app-wide, not per page.
+- `utils/`: helpers shared by every layer (domain, data, presentation), pure Dart only (`intl` is fine; no Flutter/`BuildContext`). Widget/`BuildContext` helpers go in `presentation/` instead.
 - Data sources: each client (`AppDatabase`, `Dio`, `SupabaseClient`) lives in its own `data/` folder with its provider in the same file; there is no `providers/` folder. Only repository impls use them (a repository may combine several, e.g. local DB + Supabase); pages and ViewModels see just the `domain/` repository interface. One-time init (`Supabase.initialize`) goes in `bootstrap()`, URLs/keys come from `.env.<flavor>` (public values only).
 - Dependency direction: presentation → domain ← data (ViewModels may read repository providers from `data/`). `domain/` imports nothing from `data/` or `presentation/`.
 - Pages never import each other's files. A widget/hook needed by a second page → move it to `presentation/widgets/` or `presentation/hooks/`.
@@ -94,7 +97,7 @@ lib/
 
 ### Barrel files
 
-- Barrels: `domain/domain.dart`, `data/data.dart`, `presentation/theme/theme.dart`, `presentation/widgets/widgets.dart`, `presentation/hooks/hooks.dart`, `presentation/pages/pages.dart` — `export` lines only.
+- Barrels: `utils/utils.dart`, `domain/domain.dart`, `data/data.dart`, `presentation/theme/theme.dart`, `presentation/widgets/widgets.dart`, `presentation/hooks/hooks.dart`, `presentation/pages/pages.dart` — `export` lines only.
 - `pages.dart` exports only the `<page>_page.dart` files (for the router); a page's view models, hooks and widgets stay private to it.
 - Import from outside the folder → through the barrel with a package import (`import 'package:weus/src/domain/domain.dart';`). Inside the same folder/page → direct relative imports, never its own barrel (circular imports).
 - Never export generated `*.g.dart` / `*.freezed.dart` (they're `part` files).
