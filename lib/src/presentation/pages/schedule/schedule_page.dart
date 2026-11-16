@@ -1,10 +1,10 @@
-import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:intl/intl.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
+import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
 import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/theme/theme.dart";
+import "package:weus/src/utils/utils.dart";
 
 import "hooks/use_schedule_page.dart";
 import "widgets/schedule_add_button.dart";
@@ -15,7 +15,10 @@ class SchedulePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final schedule = useSchedulePage(ref.watch(schedulesProvider));
+    final schedule = useSchedulePage(
+      // Empty until the local database answers, a few ms after launch.
+      ref.watch(schedulesProvider).value ?? const [],
+    );
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -65,7 +68,7 @@ class SchedulePage extends HookConsumerWidget {
               ? null
               : Center(
                   child: Text(
-                    DateFormat.E("ko_KR").format(day),
+                    formatWeekday(day),
                     style: weekdayStyle.copyWith(color: scheme.tertiary),
                   ),
                 ),

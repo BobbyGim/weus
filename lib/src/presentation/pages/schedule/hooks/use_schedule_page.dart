@@ -1,9 +1,8 @@
-import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
-import "package:intl/intl.dart";
+import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
-
 import "package:weus/src/domain/domain.dart";
+import "package:weus/src/utils/utils.dart";
 
 import "../widgets/schedule_day_cell.dart";
 import "../widgets/schedule_sheet.dart";
@@ -13,8 +12,6 @@ bool _isMultiDay(Schedule s) => s.start != s.end;
 /// The cell row each multi-day schedule keeps on every day it covers, so its
 /// bar stays on one line. Earlier start first, then the longer one; each takes
 /// the lowest row not held by a multi-day schedule it overlaps.
-// shortcut: a record is its own key, so two identical multi-day schedules
-// share a row; key by id once schedules come from the API.
 Map<Schedule, int> _rowsOf(List<Schedule> schedules) {
   final multiDay = schedules.where(_isMultiDay).toList()
     ..sort((a, b) {
@@ -128,7 +125,7 @@ List<ScheduleLabel?> _labelsOn(
   void Function(DateTime day) onPageChanged,
 })
 useSchedulePage(List<Schedule> schedules) {
-  final today = kstToday();
+  final today = formatKstToday();
 
   final multiDayRows = useMemoized(() => _rowsOf(schedules), [schedules]);
 
@@ -137,8 +134,6 @@ useSchedulePage(List<Schedule> schedules) {
   final focusedDay = useState(today);
 
   final context = useContext();
-
-  final monthDay = DateFormat("M월 d일", "ko_KR");
 
   void openSheet(DateTime day) => showModalBottomSheet<void>(
     context: context,
@@ -154,7 +149,7 @@ useSchedulePage(List<Schedule> schedules) {
             title: s.title,
             // A multi-day schedule leads with its date range.
             description: _isMultiDay(s)
-                ? "${monthDay.format(s.start)} – ${monthDay.format(s.end)} · ${s.description}"
+                ? "${formatMonthDay(s.start)} – ${formatMonthDay(s.end)} · ${s.description}"
                 : s.description,
           ),
       ],

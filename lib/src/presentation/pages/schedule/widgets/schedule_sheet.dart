@@ -1,9 +1,9 @@
-import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
-import "package:intl/intl.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
+import "package:weus/src/utils/utils.dart";
 
 import "hooks/use_schedule_sheet.dart";
 import "schedule_add_button.dart";
@@ -58,10 +58,7 @@ class ScheduleSheet extends HookWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        DateFormat("M월 d일 EEEE", "ko_KR").format(day),
-                        style: text.titleMedium,
-                      ),
+                      Text(formatMonthDayWeekday(day), style: text.titleMedium),
 
                       const Spacer(),
 

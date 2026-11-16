@@ -1,6 +1,6 @@
-import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
 const showcaseChips = ["전체", "예배", "소그룹", "봉사", "행사"];

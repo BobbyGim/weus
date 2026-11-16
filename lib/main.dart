@@ -1,14 +1,12 @@
-import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
-import "package:flutter_localizations/flutter_localizations.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:intl/date_symbol_data_local.dart";
-
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/pages/pages.dart";
 import "package:weus/src/presentation/theme/theme.dart";
-import "package:weus/src/router.dart";
+import "package:weus/src/router/router.dart";
 
 /// `flutter run --flavor x` (no -t) lands here and picks the env from the flavor.
 Future<void> main() => bootstrap(appFlavor ?? "dev");

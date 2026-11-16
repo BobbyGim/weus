@@ -1,5 +1,4 @@
-import "package:flutter/material.dart";
-
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 /// The top snackbar now showing, if any, so the next one can replace it.

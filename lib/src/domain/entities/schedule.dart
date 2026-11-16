@@ -1,15 +1,20 @@
-/// [start] and [end] are UTC-midnight dates, equal for a one-day schedule.
-typedef Schedule = ({
+/// What the user fills in for a schedule. [start] and [end] are UTC-midnight
+/// dates, equal for a one-day schedule.
+typedef ScheduleDraft = ({
   String title,
   String description,
   DateTime start,
   DateTime end,
 });
 
-/// Today in KST (UTC+9, no DST) whatever the device timezone is, as the
-/// UTC-midnight date schedules and table_calendar work with.
-DateTime kstToday() {
-  final kst = DateTime.now().toUtc().add(const Duration(hours: 9));
-
-  return DateTime.utc(kst.year, kst.month, kst.day);
-}
+/// A saved schedule: a [ScheduleDraft] plus what the storage adds.
+/// [updatedAt] equals [createdAt] until the schedule is edited.
+typedef Schedule = ({
+  int id,
+  String title,
+  String description,
+  DateTime start,
+  DateTime end,
+  DateTime createdAt,
+  DateTime updatedAt,
+});

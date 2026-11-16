@@ -1,8 +1,7 @@
-import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
-import "package:intl/intl.dart";
-
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/domain/domain.dart";
+import "package:weus/src/utils/utils.dart";
 
 import "../schedule_range_dialog.dart";
 
@@ -15,12 +14,12 @@ import "../schedule_range_dialog.dart";
   String endLabel,
   bool canSave,
   VoidCallback pickDates,
-  Schedule Function() schedule,
+  ScheduleDraft Function() schedule,
 })
 useScheduleAddSheet() {
   final context = useContext();
 
-  final today = useMemoized(kstToday);
+  final today = useMemoized(formatKstToday);
 
   final title = useTextEditingController();
 
@@ -32,12 +31,6 @@ useScheduleAddSheet() {
 
   // Rebuilds on typing, so the save button follows the title.
   useListenable(title);
-
-  // The year shows only when it is not this year.
-  String label(DateTime day) => DateFormat(
-    day.year == today.year ? "M월 d일 (E)" : "yyyy. M. d (E)",
-    "ko_KR",
-  ).format(day);
 
   Future<void> pickDates() async {
     final range = await showDialog<({DateTime start, DateTime end})>(
@@ -55,8 +48,8 @@ useScheduleAddSheet() {
   return (
     title: title,
     description: description,
-    startLabel: label(start.value),
-    endLabel: label(end.value),
+    startLabel: formatDateLabel(start.value, today: today),
+    endLabel: formatDateLabel(end.value, today: today),
     canSave: title.text.trim().isNotEmpty,
     pickDates: pickDates,
     schedule: () => (

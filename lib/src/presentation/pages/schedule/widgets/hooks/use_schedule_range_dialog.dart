@@ -2,7 +2,7 @@ import "package:flutter/widgets.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:table_calendar/table_calendar.dart";
 
-import "package:weus/src/domain/domain.dart";
+import "package:weus/src/utils/utils.dart";
 
 /// Range picking of the period dialog. It opens showing the current period;
 /// the first tap starts a new one and the second tap closes the dialog with
@@ -18,7 +18,7 @@ import "package:weus/src/domain/domain.dart";
 useScheduleRangeDialog(DateTime initialStart, DateTime initialEnd) {
   final context = useContext();
 
-  final today = useMemoized(kstToday);
+  final today = useMemoized(formatKstToday);
 
   final start = useState(initialStart);
 

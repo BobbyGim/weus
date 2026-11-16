@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
 /// Brand palette. Primary teal is the main accent; ink (secondary) carries
 /// everything else; tertiary blue is a rare second accent.

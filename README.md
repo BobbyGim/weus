@@ -143,7 +143,7 @@ onPressed: () => ref.read(loginViewModelProvider.notifier).signIn(),
 
 **ViewModel**
 - 상태는 같은 파일의 `@freezed` `LoginState`를 씁니다. 한 가지만 로딩한다면 `AsyncValue<T>`도 됩니다.
-- `BuildContext`, 위젯, `material.dart`를 쓰지 않습니다.
+- `BuildContext`, 위젯, `material_ui`를 쓰지 않습니다.
 - 다른 화면의 ViewModel을 watch하지 않습니다. 여러 화면이 같이 쓰는 상태는 별도 provider로 빼고, 각 ViewModel이 그 provider를 watch합니다.
 
 **Page**

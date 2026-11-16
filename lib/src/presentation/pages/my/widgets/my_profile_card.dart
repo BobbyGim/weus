@@ -1,6 +1,5 @@
-import "package:flutter/material.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
-
+import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 /// Who is signed in: avatar, then name over email. Tapping opens my info.

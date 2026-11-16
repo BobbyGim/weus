@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
 import "widgets/design_showcase.dart";
 import "widgets/home_banner_carousel.dart";

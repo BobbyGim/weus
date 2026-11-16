@@ -1,68 +1,24 @@
-import "dart:async";
-
-import "package:flutter/cupertino.dart";
+import "package:cupertino_ui/cupertino_ui.dart";
 import "package:go_router/go_router.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 import "package:weus/src/presentation/pages/pages.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
+import "deep_link_redirect.dart";
+
 part "router.g.dart";
 
-/// App router. Add routes here; auth redirects can `ref.watch` providers.
+/// 앱 라우터. 라우트 표만 두고, redirect 로직은 이 폴더의 다른 파일에 둔다.
+/// auth redirect는 provider를 `ref.watch`할 수 있다.
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   final rootKey = GlobalKey<NavigatorState>();
-
-  // Completes shortly after the app is on screen: past the first frame at
-  // launch, and resumed when it comes back from the background.
-  // shortcut: fixed delay for the iOS app-open animation, wait for the startup
-  // work (auth check) here too once there is some.
-  Future<void> onScreen() async {
-    await WidgetsBinding.instance.endOfFrame;
-
-    final state = WidgetsBinding.instance.lifecycleState;
-
-    if (state != null && state != AppLifecycleState.resumed) {
-      final resumed = Completer<void>();
-
-      final listener = AppLifecycleListener(onResume: resumed.complete);
-
-      await resumed.future;
-
-      listener.dispose();
-    }
-
-    await Future<void>.delayed(const Duration(milliseconds: 400));
-  }
-
-  var launching = true;
-
-  onScreen().then((_) => launching = false);
 
   late final GoRouter router;
 
   router = GoRouter(
     navigatorKey: rootKey,
-    // Deep link to a full screen (/mypage/info) while the app is not on screen
-    // yet (cold start, or coming back from the background): go to its tab
-    // first, then open it once the app is visible, so the user sees it slide
-    // in instead of finding it already open.
-    // shortcut: drops query parameters, pass state.uri.query once a page needs them.
-    redirect: (_, state) {
-      final segments = state.uri.pathSegments;
-
-      final lifecycle = WidgetsBinding.instance.lifecycleState;
-
-      final hidden =
-          launching ||
-          (lifecycle != null && lifecycle != AppLifecycleState.resumed);
-
-      if (!hidden || segments.length < 2) return null;
-
-      onScreen().then((_) => router.go(state.uri.path));
-
-      return "/${segments.first}";
-    },
+    redirect: deepLinkRedirect(() => router),
     routes: [
       // Tabs with header + bottom nav. indexedStack keeps each tab's state.
       StatefulShellRoute.indexedStack(
