@@ -70,7 +70,10 @@ lib/
 ├── main.dart                 # bootstrap() — 앱 시작 코드는 여기에
 ├── main_<flavor>.dart        # flavor별 진입점
 └── src/
-    ├── router.dart           # 라우트 정의 (routerProvider)
+    ├── router/
+    │   ├── router.dart             # 라우트 표 (routerProvider)
+    │   ├── deep_link_redirect.dart # 딥링크 redirect
+    │   └── app_visibility.dart     # 앱이 화면에 보일 때까지 대기 (onScreen)
     ├── utils/                # 어느 레이어에서나 쓰는 순수 Dart 헬퍼
     ├── domain/
     │   ├── entities/
