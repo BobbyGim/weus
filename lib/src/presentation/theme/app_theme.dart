@@ -7,94 +7,112 @@ import "app_tokens.dart";
 
 const _scheme = appColorScheme;
 
+/// 앱 전체 고정폭 숫자: 날짜·시간·개수의 자릿수가 위아래로 맞는다.
+const _tabularFigures = [FontFeature.tabularFigures()];
+
 /// Pretendard scale tuned for Korean: tighter tracking on large sizes,
 /// 1.5 line height for body copy. Colors come from the color scheme.
 const _textTheme = TextTheme(
   displayLarge: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 40,
     fontWeight: .w800,
     height: 1.2,
     letterSpacing: -1.0,
   ),
   displayMedium: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 32,
     fontWeight: .w700,
     height: 1.25,
     letterSpacing: -0.8,
   ),
   displaySmall: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 28,
     fontWeight: .w700,
     height: 1.3,
     letterSpacing: -0.6,
   ),
   headlineLarge: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 24,
     fontWeight: .w700,
     height: 1.35,
     letterSpacing: -0.5,
   ),
   headlineMedium: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 22,
     fontWeight: .w700,
     height: 1.35,
     letterSpacing: -0.4,
   ),
   headlineSmall: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 20,
     fontWeight: .w700,
     height: 1.4,
     letterSpacing: -0.3,
   ),
   titleLarge: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 18,
     fontWeight: .w600,
     height: 1.4,
     letterSpacing: -0.3,
   ),
   titleMedium: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 16,
     fontWeight: .w600,
     height: 1.45,
     letterSpacing: -0.2,
   ),
   titleSmall: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 14,
     fontWeight: .w600,
     height: 1.45,
     letterSpacing: -0.1,
   ),
   bodyLarge: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 16,
     fontWeight: .w400,
     height: 1.5,
     letterSpacing: -0.2,
   ),
   bodyMedium: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 15,
     fontWeight: .w400,
     height: 1.5,
     letterSpacing: -0.1,
   ),
   bodySmall: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 13,
     fontWeight: .w400,
     height: 1.45,
     letterSpacing: 0,
   ),
   labelLarge: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 15,
     fontWeight: .w600,
     height: 1.3,
     letterSpacing: -0.1,
   ),
   labelMedium: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 13,
     fontWeight: .w500,
     height: 1.3,
     letterSpacing: 0,
   ),
   labelSmall: TextStyle(
+    fontFeatures: _tabularFigures,
     fontSize: 12,
     fontWeight: .w500,
     height: 1.3,
