@@ -1,7 +1,7 @@
 import "package:drift/drift.dart";
 
-/// A schedule on the calendar; the dates are UTC midnight, equal for a
-/// one-day schedule.
+/// A schedule on the calendar. 시작·종료는 고른 날짜 + 저장한 순간의 시각
+/// (created_at과 같은 형식), 하루 일정이면 날짜가 같다.
 @DataClassName("ScheduleRow")
 class ScheduleRows extends Table {
   @override

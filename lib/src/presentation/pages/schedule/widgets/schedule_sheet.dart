@@ -2,11 +2,13 @@ import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
+import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/utils/utils.dart";
 
 import "hooks/use_schedule_sheet.dart";
 import "schedule_add_button.dart";
+import "schedule_add_sheet.dart";
 import "schedule_tile.dart";
 
 /// Bottom sheet body, 70% of the screen: the day's date, then its schedules, or an
@@ -16,7 +18,7 @@ class ScheduleSheet extends HookWidget {
 
   final DateTime day;
 
-  final List<({String title, String description})> schedules;
+  final List<Schedule> schedules;
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +132,10 @@ class ScheduleSheet extends HookWidget {
                                     child: ScheduleTile(
                                       title: s.title,
                                       description: s.description,
+                                      onTap: () => showScheduleAddSheet(
+                                        context,
+                                        schedule: s,
+                                      ),
                                     ),
                                   ),
                               ],

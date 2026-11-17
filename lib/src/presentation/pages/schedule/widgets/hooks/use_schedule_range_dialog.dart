@@ -4,53 +4,39 @@ import "package:table_calendar/table_calendar.dart";
 
 import "package:weus/src/utils/utils.dart";
 
-/// Range picking of the period dialog. It opens showing the current period;
-/// the first tap starts a new one and the second tap closes the dialog with
-/// the two days in order (the same day twice is a one-day period).
+/// 기간 다이얼로그에서 날짜 하나 고르기. [pickingEnd]가 false면 시작일, true면
+/// 종료일을 바꾼다. 누르는 즉시 `(start: …, end: …)`로 닫힌다.
+/// 시작일을 종료일 뒤로 옮기면 종료일도 같은 날로 따라가고, 종료일은 시작일
+/// 이전 날을 고를 수 없다.
 ({
   DateTime today,
   DateTime focusedDay,
-  DateTime start,
-  DateTime? end,
   OnDaySelected onDaySelected,
   void Function(DateTime day) onPageChanged,
+  bool Function(DateTime day) isEnabled,
 })
-useScheduleRangeDialog(DateTime initialStart, DateTime initialEnd) {
+useScheduleRangeDialog(
+  DateTime start,
+  DateTime end, {
+  required bool pickingEnd,
+}) {
   final context = useContext();
 
   final today = useMemoized(formatKstToday);
 
-  final start = useState(initialStart);
+  final focusedDay = useState(pickingEnd ? end : start);
 
-  final end = useState<DateTime?>(initialEnd);
-
-  final focusedDay = useState(initialStart);
-
-  void onDaySelected(DateTime day, DateTime focused) {
-    // A whole period is showing: this tap is the start of a new one.
-    if (end.value != null) {
-      start.value = day;
-
-      end.value = null;
-
-      focusedDay.value = focused;
-
-      return;
-    }
-
-    final first = start.value;
-
-    Navigator.of(context).pop(
-      day.isBefore(first) ? (start: day, end: first) : (start: first, end: day),
-    );
-  }
+  void onDaySelected(DateTime day, DateTime _) => Navigator.of(context).pop(
+    pickingEnd
+        ? (start: start, end: day)
+        : (start: day, end: day.isAfter(end) ? day : end),
+  );
 
   return (
     today: today,
     focusedDay: focusedDay.value,
-    start: start.value,
-    end: end.value,
     onDaySelected: onDaySelected,
     onPageChanged: (day) => focusedDay.value = day,
+    isEnabled: (day) => !pickingEnd || !day.isBefore(start),
   );
 }

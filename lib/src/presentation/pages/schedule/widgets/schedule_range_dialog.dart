@@ -6,23 +6,26 @@ import "package:weus/src/presentation/theme/theme.dart";
 
 import "hooks/use_schedule_range_dialog.dart";
 
-/// Dialog that picks a schedule's period: only a month calendar and a close
-/// button. It pops with `(start: …, end: …)` as soon as the second day is
-/// tapped, or with nothing when closed.
+/// 일정의 시작일 또는 종료일([pickingEnd])을 고르는 다이얼로그: 제목, 지금 기간이
+/// 표시된 달력, 닫기 버튼. 날짜를 누르면 바로 `(start: …, end: …)`로 닫히고,
+/// 닫기를 누르면 아무것도 반환하지 않는다.
 class ScheduleRangeDialog extends HookWidget {
   const ScheduleRangeDialog({
     super.key,
     required this.start,
     required this.end,
+    required this.pickingEnd,
   });
 
   final DateTime start;
 
   final DateTime end;
 
+  final bool pickingEnd;
+
   @override
   Widget build(BuildContext context) {
-    final range = useScheduleRangeDialog(start, end);
+    final range = useScheduleRangeDialog(start, end, pickingEnd: pickingEnd);
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -42,6 +45,15 @@ class ScheduleRangeDialog extends HookWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.lg),
+                child: Text(
+                  pickingEnd ? "종료일 선택" : "시작일 선택",
+                  textAlign: TextAlign.center,
+                  style: text.titleMedium,
+                ),
+              ),
+
               TableCalendar(
                 locale: "ko_KR",
                 // Same span as the calendar page.
@@ -49,8 +61,9 @@ class ScheduleRangeDialog extends HookWidget {
                 lastDay: DateTime.utc(2035, 12, 31),
                 focusedDay: range.focusedDay,
                 currentDay: range.today,
-                rangeStartDay: range.start,
-                rangeEndDay: range.end,
+                rangeStartDay: start,
+                rangeEndDay: end,
+                enabledDayPredicate: range.isEnabled,
                 onDaySelected: range.onDaySelected,
                 onPageChanged: range.onPageChanged,
                 availableCalendarFormats: const {CalendarFormat.month: ""},
@@ -75,6 +88,9 @@ class ScheduleRangeDialog extends HookWidget {
                 ),
                 calendarStyle: CalendarStyle(
                   outsideDaysVisible: false,
+                  disabledTextStyle: text.bodyMedium!.copyWith(
+                    color: AppColors.gray300,
+                  ),
                   defaultTextStyle: text.bodyMedium!,
                   weekendTextStyle: text.bodyMedium!.copyWith(
                     color: scheme.error,

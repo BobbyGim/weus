@@ -5,37 +5,42 @@ import "package:weus/src/utils/utils.dart";
 
 import "../schedule_range_dialog.dart";
 
-/// Form state of the registration sheet. The period starts as today to today
-/// (KST); the schedule can be saved once it has a title.
+/// 등록/수정 시트의 폼 상태. 등록은 오늘~오늘(KST)로, 수정은 [initial]의 값으로
+/// 시작하고, 제목이 있으면 저장할 수 있다.
 ({
   TextEditingController title,
   TextEditingController description,
   String startLabel,
   String endLabel,
   bool canSave,
-  VoidCallback pickDates,
+  VoidCallback pickStart,
+  VoidCallback pickEnd,
   ScheduleDraft Function() schedule,
 })
-useScheduleAddSheet() {
+useScheduleAddSheet(Schedule? initial) {
   final context = useContext();
 
   final today = useMemoized(formatKstToday);
 
-  final title = useTextEditingController();
+  final title = useTextEditingController(text: initial?.title);
 
-  final description = useTextEditingController();
+  final description = useTextEditingController(text: initial?.description);
 
-  final start = useState(today);
+  final start = useState(initial?.start ?? today);
 
-  final end = useState(today);
+  final end = useState(initial?.end ?? today);
 
   // Rebuilds on typing, so the save button follows the title.
   useListenable(title);
 
-  Future<void> pickDates() async {
+  Future<void> pick({required bool pickingEnd}) async {
     final range = await showDialog<({DateTime start, DateTime end})>(
       context: context,
-      builder: (_) => ScheduleRangeDialog(start: start.value, end: end.value),
+      builder: (_) => ScheduleRangeDialog(
+        start: start.value,
+        end: end.value,
+        pickingEnd: pickingEnd,
+      ),
     );
 
     if (range == null) return;
@@ -48,10 +53,11 @@ useScheduleAddSheet() {
   return (
     title: title,
     description: description,
-    startLabel: formatDateLabel(start.value, today: today),
-    endLabel: formatDateLabel(end.value, today: today),
+    startLabel: formatDotDate(start.value),
+    endLabel: formatDotDate(end.value),
     canSave: title.text.trim().isNotEmpty,
-    pickDates: pickDates,
+    pickStart: () => pick(pickingEnd: false),
+    pickEnd: () => pick(pickingEnd: true),
     schedule: () => (
       title: title.text.trim(),
       description: description.text.trim(),

@@ -141,19 +141,8 @@ useSchedulePage(List<Schedule> schedules) {
     useRootNavigator: true,
     // Lets ScheduleSheet set its own height (70% of the screen).
     isScrollControlled: true,
-    builder: (_) => ScheduleSheet(
-      day: day,
-      schedules: [
-        for (final s in _schedulesOn(schedules, day))
-          (
-            title: s.title,
-            // A multi-day schedule leads with its date range.
-            description: _isMultiDay(s)
-                ? "${formatMonthDay(s.start)} – ${formatMonthDay(s.end)} · ${s.description}"
-                : s.description,
-          ),
-      ],
-    ),
+    builder: (_) =>
+        ScheduleSheet(day: day, schedules: _schedulesOn(schedules, day)),
   );
 
   return (
