@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # DateTime을 숫자 대신 ISO-8601 문자열("2026-11-16T00:00:00.000Z")로 저장
+          store_date_time_values_as_text: true
