@@ -3,7 +3,7 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "package:weus/src/domain/domain.dart";
 
-import "../database/app_database.dart";
+import "../database/database.dart";
 
 part "schedule_repository_impl.g.dart";
 

@@ -4,8 +4,7 @@ import "package:table_calendar/table_calendar.dart";
 import "package:weus/src/domain/domain.dart";
 import "package:weus/src/utils/utils.dart";
 
-import "../widgets/schedule_day_cell.dart";
-import "../widgets/schedule_sheet.dart";
+import "../widgets/widgets.dart";
 
 bool _isMultiDay(Schedule s) => s.start != s.end;
 

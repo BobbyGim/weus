@@ -3,8 +3,7 @@ import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
-import "widgets/my_menu_tile.dart";
-import "widgets/my_profile_card.dart";
+import "widgets/widgets.dart";
 
 // shortcut: menus with a null path are placeholders with no-op taps, give
 // each its route when the page behind it exists.

@@ -2,7 +2,7 @@ import "package:drift/drift.dart";
 import "package:drift_flutter/drift_flutter.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
-import "tables/schedule_rows.dart";
+import "tables/tables.dart";
 
 part "app_database.g.dart";
 

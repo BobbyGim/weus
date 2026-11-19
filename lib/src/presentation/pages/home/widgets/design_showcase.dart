@@ -3,7 +3,7 @@ import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
-import "hooks/use_design_showcase.dart";
+import "hooks/hooks.dart";
 
 // ponytail: design-system demo on the home tab; delete once real home content lands.
 const _swatches = [

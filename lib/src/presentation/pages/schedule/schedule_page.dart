@@ -6,9 +6,8 @@ import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/utils/utils.dart";
 
-import "hooks/use_schedule_page.dart";
-import "widgets/schedule_add_button.dart";
-import "widgets/schedule_day_cell.dart";
+import "hooks/hooks.dart";
+import "widgets/widgets.dart";
 
 class SchedulePage extends HookConsumerWidget {
   const SchedulePage({super.key});

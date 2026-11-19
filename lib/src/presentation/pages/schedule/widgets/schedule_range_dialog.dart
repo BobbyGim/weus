@@ -4,7 +4,7 @@ import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
-import "hooks/use_schedule_range_dialog.dart";
+import "hooks/hooks.dart";
 
 /// 일정의 시작일 또는 종료일([pickingEnd])을 고르는 다이얼로그: 제목, 지금 기간이
 /// 표시된 달력, 닫기 버튼. 날짜를 누르면 바로 `(start: …, end: …)`로 닫히고,

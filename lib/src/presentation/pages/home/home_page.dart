@@ -1,7 +1,6 @@
 import "package:material_ui/material_ui.dart";
 
-import "widgets/design_showcase.dart";
-import "widgets/home_banner_carousel.dart";
+import "widgets/widgets.dart";
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

@@ -2,7 +2,7 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "package:weus/src/domain/domain.dart";
 
-import "repositories/schedule_repository_impl.dart";
+import "repositories/repositories.dart";
 
 part "schedules_provider.g.dart";
 

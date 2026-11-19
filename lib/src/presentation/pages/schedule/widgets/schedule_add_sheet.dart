@@ -6,7 +6,7 @@ import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
-import "hooks/use_schedule_add_sheet.dart";
+import "hooks/hooks.dart";
 
 /// 일정 등록 시트를 연다. [schedule]을 넘기면 그 일정을 수정한다.
 /// 하루 시트 안에서 열면 그 시트를 먼저 닫는다 (저장 후 목록이 낡기 때문).

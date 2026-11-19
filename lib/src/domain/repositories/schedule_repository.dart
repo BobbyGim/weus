@@ -1,4 +1,4 @@
-import "../entities/schedule.dart";
+import "../entities/entities.dart";
 
 abstract interface class ScheduleRepository {
   /// Every schedule, emitted again after each change.

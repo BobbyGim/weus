@@ -3,7 +3,7 @@ import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
-import "hooks/use_notification_settings_page.dart";
+import "hooks/hooks.dart";
 
 class NotificationSettingsPage extends HookWidget {
   const NotificationSettingsPage({super.key});

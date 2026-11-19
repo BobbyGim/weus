@@ -1,4 +1,5 @@
-export "database/app_database.dart";
+export "database/database.dart";
 export "offline_provider.dart";
-export "repositories/schedule_repository_impl.dart";
+export "repositories/repositories.dart";
 export "schedules_provider.dart";
+export "supabase/supabase.dart";

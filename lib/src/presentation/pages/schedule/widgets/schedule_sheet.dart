@@ -6,7 +6,7 @@ import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/utils/utils.dart";
 
-import "hooks/use_schedule_sheet.dart";
+import "hooks/hooks.dart";
 import "schedule_add_button.dart";
 import "schedule_add_sheet.dart";
 import "schedule_tile.dart";
