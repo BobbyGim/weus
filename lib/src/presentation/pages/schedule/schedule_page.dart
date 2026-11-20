@@ -14,10 +14,14 @@ class SchedulePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final schedule = useSchedulePage(
-      // Empty until the local database answers, a few ms after launch.
-      ref.watch(schedulesProvider).value ?? const [],
-    );
+    final schedules = ref.watch(schedulesProvider);
+
+    // 로딩이 끝나지 않으면 아래에서 달력 대신 로딩을 보여준다 (훅은 항상 먼저 부른다).
+    final schedule = useSchedulePage(schedules.value ?? const []);
+
+    if (!schedules.hasValue && !schedules.hasError) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -68,7 +72,7 @@ class SchedulePage extends HookConsumerWidget {
               : Center(
                   child: Text(
                     formatWeekday(day),
-                    style: weekdayStyle.copyWith(color: scheme.tertiary),
+                    style: weekdayStyle.copyWith(color: scheme.primary),
                   ),
                 ),
           // Every day cell is ours: number on top, schedule titles under.

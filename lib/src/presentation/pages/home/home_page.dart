@@ -9,13 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        children: const [
-          SizedBox(height: 8),
-
-          HomeBannerCarousel(),
-
-          DesignShowcase(),
-        ],
+        children: const [SizedBox(height: 8), HomeBannerCarousel()],
       ),
     );
   }

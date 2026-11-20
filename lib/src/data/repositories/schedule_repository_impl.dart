@@ -1,17 +1,21 @@
 import "package:drift/drift.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 
 import "package:weus/src/domain/domain.dart";
 
 import "../database/database.dart";
+import "../supabase/supabase.dart";
 
 part "schedule_repository_impl.g.dart";
 
-/// Schedules kept in the local database.
+/// Schedules kept in the local database, plus the shared ones in Supabase.
 class ScheduleRepositoryImpl implements ScheduleRepository {
-  const ScheduleRepositoryImpl(this._db);
+  const ScheduleRepositoryImpl(this._db, this._supabase);
 
   final AppDatabase _db;
+
+  final SupabaseClient _supabase;
 
   @override
   Stream<List<Schedule>> watchAll() => _db
@@ -22,6 +26,7 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
           for (final row in rows)
             (
               id: row.id,
+              isShared: false,
               title: row.title,
               description: row.description,
               start: _day(row.startDate),
@@ -31,6 +36,29 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
             ),
         ],
       );
+
+  // start_date·end_date는 date 컬럼이라 "2026-11-19"로 온다.
+  @override
+  Future<List<Schedule>> fetchShared() async {
+    final rows = await _supabase
+        .from("schedules")
+        .select()
+        .isFilter("deleted_at", null);
+
+    return [
+      for (final row in rows)
+        (
+          id: row["id"] as int,
+          isShared: true,
+          title: row["title"] as String,
+          description: row["description"] as String,
+          start: _utcDate(row["start_date"] as String),
+          end: _utcDate(row["end_date"] as String),
+          createdAt: DateTime.parse(row["created_at"] as String),
+          updatedAt: DateTime.parse(row["updated_at"] as String),
+        ),
+    ];
+  }
 
   @override
   Future<void> add(ScheduleDraft draft) {
@@ -93,6 +121,11 @@ DateTime _day(DateTime at) {
   return DateTime.utc(local.year, local.month, local.day);
 }
 
+/// "2026-11-19" → 앱의 날짜(UTC 자정).
+DateTime _utcDate(String date) => DateTime.parse("${date}T00:00:00Z");
+
 @Riverpod(keepAlive: true)
-ScheduleRepository scheduleRepository(Ref ref) =>
-    ScheduleRepositoryImpl(ref.watch(appDatabaseProvider));
+ScheduleRepository scheduleRepository(Ref ref) => ScheduleRepositoryImpl(
+  ref.watch(appDatabaseProvider),
+  ref.watch(supabaseProvider),
+);

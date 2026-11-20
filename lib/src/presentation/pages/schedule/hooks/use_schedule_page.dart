@@ -8,12 +8,20 @@ import "../widgets/widgets.dart";
 
 bool _isMultiDay(Schedule s) => s.start != s.end;
 
+/// 공동일정 먼저 (가장 위에 보이게).
+int _sharedFirst(Schedule a, Schedule b) =>
+    (b.isShared ? 1 : 0) - (a.isShared ? 1 : 0);
+
 /// The cell row each multi-day schedule keeps on every day it covers, so its
-/// bar stays on one line. Earlier start first, then the longer one; each takes
-/// the lowest row not held by a multi-day schedule it overlaps.
+/// bar stays on one line. 공동일정 먼저, then earlier start, then the longer
+/// one; each takes the lowest row not held by a multi-day schedule it overlaps.
 Map<Schedule, int> _rowsOf(List<Schedule> schedules) {
   final multiDay = schedules.where(_isMultiDay).toList()
     ..sort((a, b) {
+      final byShared = _sharedFirst(a, b);
+
+      if (byShared != 0) return byShared;
+
       final byStart = a.start.compareTo(b.start);
 
       return byStart != 0 ? byStart : b.end.compareTo(a.end);
@@ -39,7 +47,7 @@ Map<Schedule, int> _rowsOf(List<Schedule> schedules) {
   return rows;
 }
 
-/// Schedules covering [day], multi-day ones first.
+/// Schedules covering [day]: 공동일정 먼저, 그 안에서 multi-day ones first.
 List<Schedule> _schedulesOn(List<Schedule> schedules, DateTime day) {
   final covering = [
     for (final s in schedules)
@@ -47,8 +55,11 @@ List<Schedule> _schedulesOn(List<Schedule> schedules, DateTime day) {
   ];
 
   return [
-    ...covering.where(_isMultiDay),
-    ...covering.where((s) => !_isMultiDay(s)),
+    for (final shared in [true, false]) ...[
+      ...covering.where((s) => s.isShared == shared && _isMultiDay(s)),
+
+      ...covering.where((s) => s.isShared == shared && !_isMultiDay(s)),
+    ],
   ];
 }
 
@@ -103,6 +114,7 @@ List<ScheduleLabel?> _labelsOn(
       else
         (
           title: s.title,
+          isShared: s.isShared,
           isMultiDay: _isMultiDay(s),
           index: day.difference(latest([s.start, rowStart, monthStart])).inDays,
           span:

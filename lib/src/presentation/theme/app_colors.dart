@@ -1,18 +1,20 @@
 import "package:material_ui/material_ui.dart";
 
-/// Brand palette. Primary teal is the main accent; ink (secondary) carries
-/// everything else; tertiary blue is a rare second accent.
+/// Brand palette. Primary blue is the main accent; ink (secondary) carries
+/// everything else; tertiary mint is a rare second accent (공동일정).
 abstract final class AppColors {
-  static const primary = Color(0xFF0F766E);
+  static const primary = Color(0xFF3182F6);
 
-  static const primaryPressed = Color(0xFF0B5C56);
+  static const primaryPressed = Color(0xFF1B64DA);
 
-  static const primarySoft = Color(0xFFD5F0EC);
+  static const primarySoft = Color(0xFFE8F3FF);
 
-  /// Second accent, blue. Used sparingly (e.g. Saturdays in the calendar).
-  static const tertiary = Color(0xFF2F6BFF);
+  /// Second accent, mint. Used sparingly (e.g. 공동일정 in the calendar).
+  static const tertiary = Color(0xFF13B5A6);
 
-  static const ink = Color(0xFF161718);
+  static const tertiarySoft = Color(0xFFDDF6F3);
+
+  static const ink = Color(0xFF191F28);
 
   static const gray600 = Color(0xFF5D6066);
 
@@ -38,13 +40,15 @@ const appColorScheme = ColorScheme(
   primary: AppColors.primary,
   onPrimary: Colors.white,
   primaryContainer: AppColors.primarySoft,
-  onPrimaryContainer: Color(0xFF083F3A),
+  onPrimaryContainer: Color(0xFF0B3A7A),
   secondary: AppColors.ink,
   onSecondary: AppColors.paper,
   secondaryContainer: AppColors.gray150,
   onSecondaryContainer: AppColors.ink,
   tertiary: AppColors.tertiary,
   onTertiary: Colors.white,
+  tertiaryContainer: AppColors.tertiarySoft,
+  onTertiaryContainer: Color(0xFF0A5C54),
   error: AppColors.error,
   onError: Colors.white,
   errorContainer: Color(0xFFFFE5E5),
@@ -61,7 +65,7 @@ const appColorScheme = ColorScheme(
   outlineVariant: AppColors.gray200,
   inverseSurface: AppColors.ink,
   onInverseSurface: AppColors.gray100,
-  inversePrimary: Color(0xFF7FD4C8),
+  inversePrimary: Color(0xFF90C2FF),
   // No M3 elevation tint: surfaces stay neutral gray.
   surfaceTint: Colors.transparent,
 );

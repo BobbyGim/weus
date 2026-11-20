@@ -104,7 +104,6 @@ class ScheduleAddSheet extends HookConsumerWidget {
         context,
         editing == null ? "일정을 등록했어요" : "일정을 수정했어요",
         icon: LucideIcons.circleCheck,
-        top: true,
       );
 
       Navigator.of(context).pop();

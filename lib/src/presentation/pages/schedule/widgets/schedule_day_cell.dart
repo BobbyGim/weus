@@ -7,8 +7,15 @@ const _maxLabels = 3;
 
 /// A schedule as one day's cell shows it. A multi-day schedule is a bar of
 /// [span] cells in this week row, and this day is its cell number [index]
-/// (0-based); a one-day schedule has index 0 and span 1.
-typedef ScheduleLabel = ({String title, bool isMultiDay, int index, int span});
+/// (0-based); a one-day schedule has index 0 and span 1. 공동일정([isShared])은
+/// 민트색(tertiary)으로 그린다.
+typedef ScheduleLabel = ({
+  String title,
+  bool isShared,
+  bool isMultiDay,
+  int index,
+  int span,
+});
 
 /// One day of the month grid: the day number on top, then up to 3 schedule
 /// labels in order. A one-day schedule is a soft chip; a multi-day one is a
@@ -40,7 +47,7 @@ class ScheduleDayCell extends StatelessWidget {
     final dayColor = switch (day.weekday) {
       _ when isToday => scheme.primary,
       DateTime.sunday => scheme.error,
-      DateTime.saturday => scheme.tertiary,
+      DateTime.saturday => scheme.primary,
       _ => scheme.onSurface,
     };
 
@@ -61,7 +68,9 @@ class ScheduleDayCell extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(1, 0, 1, 2),
           padding: const EdgeInsets.symmetric(horizontal: 3),
           decoration: BoxDecoration(
-            color: scheme.primaryContainer,
+            color: l.isShared
+                ? scheme.tertiaryContainer
+                : scheme.primaryContainer,
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
@@ -70,7 +79,11 @@ class ScheduleDayCell extends StatelessWidget {
             softWrap: false,
             overflow: TextOverflow.clip,
             textAlign: TextAlign.center,
-            style: labelStyle.copyWith(color: scheme.onPrimaryContainer),
+            style: labelStyle.copyWith(
+              color: l.isShared
+                  ? scheme.onTertiaryContainer
+                  : scheme.onPrimaryContainer,
+            ),
           ),
         );
       }
@@ -85,7 +98,7 @@ class ScheduleDayCell extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 2),
         decoration: BoxDecoration(
-          color: scheme.primary,
+          color: l.isShared ? scheme.tertiary : scheme.primary,
           borderRadius: BorderRadius.horizontal(
             left: Radius.circular(opens ? 4 : 0),
             right: Radius.circular(closes ? 4 : 0),
@@ -113,7 +126,9 @@ class ScheduleDayCell extends StatelessWidget {
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: labelStyle.copyWith(color: scheme.onPrimary),
+                  style: labelStyle.copyWith(
+                    color: l.isShared ? scheme.onTertiary : scheme.onPrimary,
+                  ),
                 ),
               );
             },
