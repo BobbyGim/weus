@@ -199,8 +199,13 @@ ThemeData get appTheme => ThemeData(
       vertical: AppSpacing.md + 2,
     ),
     hintStyle: _textTheme.bodyLarge?.copyWith(color: _scheme.onSurfaceVariant),
-    border: _inputBorder,
-    enabledBorder: _inputBorder,
+    // 칸 바탕이 화면 바탕과 거의 같아서 얇은 테두리로 경계를 보여준다.
+    border: _inputBorder.copyWith(
+      borderSide: BorderSide(color: _scheme.outlineVariant),
+    ),
+    enabledBorder: _inputBorder.copyWith(
+      borderSide: BorderSide(color: _scheme.outlineVariant),
+    ),
     focusedBorder: _inputBorder.copyWith(
       borderSide: BorderSide(color: _scheme.primary, width: 1.5),
     ),

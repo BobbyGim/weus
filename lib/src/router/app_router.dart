@@ -1,9 +1,11 @@
 import "package:cupertino_ui/cupertino_ui.dart";
 import "package:go_router/go_router.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
+import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/pages/pages.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
+import "auth_redirect.dart";
 import "deep_link_redirect.dart";
 
 part "app_router.g.dart";
@@ -14,15 +16,39 @@ part "app_router.g.dart";
 GoRouter router(Ref ref) {
   final rootKey = GlobalKey<NavigatorState>();
 
+  final auth = ref.watch(authRepositoryProvider);
+
+  final toAuth = authRedirect(auth);
+
   late final GoRouter router;
+
+  final toDeepLink = deepLinkRedirect(() => router);
 
   router = GoRouter(
     navigatorKey: rootKey,
-    redirect: deepLinkRedirect(() => router),
+    redirect: (context, state) =>
+        toAuth(context, state) ?? toDeepLink(context, state),
     routes: [
+      // 로그인 화면과 탭(홈)은 서로 갈아끼우는 화면이라 슬라이드 없이 바뀐다.
+      GoRoute(
+        path: "/signin",
+        pageBuilder: (_, state) =>
+            NoTransitionPage(key: state.pageKey, child: const SignInPage()),
+        routes: [
+          GoRoute(
+            path: "signup",
+            pageBuilder: (_, state) =>
+                CupertinoPage(key: state.pageKey, child: const SignUpPage()),
+          ),
+        ],
+      ),
+
       // Tabs with header + bottom nav. indexedStack keeps each tab's state.
       StatefulShellRoute.indexedStack(
-        builder: (_, _, shell) => AppShell(shell: shell),
+        pageBuilder: (_, state, shell) => NoTransitionPage(
+          key: state.pageKey,
+          child: AppShell(shell: shell),
+        ),
         branches: [
           StatefulShellBranch(
             routes: [GoRoute(path: "/", builder: (_, _) => const HomePage())],
@@ -78,6 +104,11 @@ GoRouter router(Ref ref) {
       ),
     ],
   );
+
+  // 로그인·로그아웃하면 redirect를 다시 돌려 로그인 화면과 홈 사이를 옮긴다.
+  final signedIn = auth.watchSignedIn().listen((_) => router.refresh());
+
+  ref.onDispose(signedIn.cancel);
 
   return router;
 }

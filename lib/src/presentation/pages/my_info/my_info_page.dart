@@ -1,13 +1,18 @@
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
-class MyInfoPage extends StatelessWidget {
+import "view_models/view_models.dart";
+
+class MyInfoPage extends ConsumerWidget {
   const MyInfoPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(myInfoViewModelProvider);
+
     final scheme = Theme.of(context).colorScheme;
 
     final text = Theme.of(context).textTheme;
@@ -27,10 +32,10 @@ class MyInfoPage extends StatelessWidget {
                 horizontal: AppSpacing.lg,
               ),
               title: Text("닉네임", style: text.bodyLarge),
-              // shortcut: hardcoded user, read it from a MyInfoViewModel once
-              // auth lands.
+              // 불러오는 동안은 비워 둔다.
               trailing: Text(
-                "위어스",
+                profile.value?.nickname ??
+                    (profile.hasError ? "불러오지 못했어요" : ""),
                 style: text.bodyLarge!.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
@@ -38,8 +43,11 @@ class MyInfoPage extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.xxl),
 
-          // shortcut: no-op, call the auth sign-out once it exists.
-          OutlinedButton(onPressed: () {}, child: const Text("로그아웃")),
+          OutlinedButton(
+            onPressed: () =>
+                ref.read(myInfoViewModelProvider.notifier).signOut(),
+            child: const Text("로그아웃"),
+          ),
         ],
       ),
     );

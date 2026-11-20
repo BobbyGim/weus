@@ -73,6 +73,7 @@ lib/
     ├── router/
     │   ├── router.dart             # barrel
     │   ├── app_router.dart         # 라우트 표 (routerProvider)
+    │   ├── auth_redirect.dart      # 로그인 여부 redirect
     │   ├── deep_link_redirect.dart # 딥링크 redirect
     │   └── app_visibility.dart     # 앱이 화면에 보일 때까지 대기 (onScreen)
     ├── utils/                # 어느 레이어에서나 쓰는 순수 Dart 헬퍼

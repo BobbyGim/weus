@@ -5,3 +5,5 @@ export "my_info/my_info.dart";
 export "notification_settings/notification_settings.dart";
 export "offline/offline.dart";
 export "schedule/schedule.dart";
+export "sign_in/sign_in.dart";
+export "sign_up/sign_up.dart";

@@ -1,3 +1,4 @@
 export "app_back_button.dart";
+export "app_loading_overlay.dart";
 export "app_shell.dart";
 export "app_snack_bar.dart";
