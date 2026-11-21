@@ -27,12 +27,12 @@ class GroupEmpty extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.lg),
 
-          Text("아직 참여한 모임이 없어요", style: text.titleMedium),
+          Text("아직 참여한 그룹이 없어요", style: text.titleMedium),
 
           const SizedBox(height: AppSpacing.sm),
 
           Text(
-            "공개 모임을 찾아 참여하거나\n+ 버튼으로 첫 모임을 만들어 보세요",
+            "공개 그룹을 찾아 참여하거나\n+ 버튼으로 첫 그룹을 만들어 보세요",
             textAlign: TextAlign.center,
             style: text.bodyMedium!.copyWith(color: scheme.onSurfaceVariant),
           ),
@@ -41,7 +41,7 @@ class GroupEmpty extends StatelessWidget {
 
           FilledButton(
             onPressed: () => context.go("/group/explore"),
-            child: const Text("모임 찾아보기"),
+            child: const Text("그룹 찾아보기"),
           ),
 
           const SizedBox(height: AppSpacing.sm),

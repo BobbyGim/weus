@@ -39,7 +39,7 @@ class GroupRequestCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          "모임장의 수락을 기다리고 있어요",
+          "그룹장의 수락을 기다리고 있어요",
           style: text.bodyMedium!.copyWith(color: scheme.onSurfaceVariant),
         ),
         trailing: TextButton(onPressed: onCancel, child: const Text("신청 취소")),

@@ -48,7 +48,7 @@ class GroupJoinPage extends HookConsumerWidget {
 
         showAppSnackBar(
           context,
-          "가입을 신청했어요. 모임장이 수락하면 참여돼요",
+          "가입을 신청했어요. 그룹장이 수락하면 참여돼요",
           icon: LucideIcons.circleCheck,
         );
 
@@ -67,7 +67,7 @@ class GroupJoinPage extends HookConsumerWidget {
     // 칸과 찾은 모임은 위에, 버튼은 맨 아래(키보드가 올라오면 키보드 바로 위).
     return AppLoadingOverlay(
       loading: loading,
-      label: found == null ? "모임 찾는 중" : "가입 신청 중",
+      label: found == null ? "그룹 찾는 중" : "가입 신청 중",
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -113,7 +113,7 @@ class GroupJoinPage extends HookConsumerWidget {
                           }
                         },
                         decoration: const InputDecoration(
-                          hintText: "모임에서 받은 8자리 코드",
+                          hintText: "그룹에서 받은 8자리 코드",
                           counterText: "",
                         ),
                       ),
@@ -161,7 +161,7 @@ class GroupJoinPage extends HookConsumerWidget {
                           onPressed: form.filled && !loading
                               ? () => viewModel.find(form.code)
                               : null,
-                          child: const Text("모임 찾기"),
+                          child: const Text("그룹 찾기"),
                         )
                       else
                         FilledButton(

@@ -13,7 +13,7 @@ class GroupAddButton extends StatelessWidget {
     return FloatingActionButton(
       // 일정 탭의 버튼과 Hero 태그가 겹치지 않게.
       heroTag: null,
-      tooltip: "모임 만들기",
+      tooltip: "그룹 만들기",
       onPressed: () => context.go("/group/new"),
       backgroundColor: scheme.primary,
       foregroundColor: scheme.onPrimary,

@@ -20,7 +20,7 @@ class GroupJoinViewModel extends _$GroupJoinViewModel {
     final result = await AsyncValue.guard(() async {
       final preview = await ref.read(groupRepositoryProvider).preview(code);
 
-      if (preview == null) throw const GroupFailure("초대 코드에 맞는 모임이 없어요");
+      if (preview == null) throw const GroupFailure("초대 코드에 맞는 그룹이 없어요");
 
       return (code: code, preview: preview);
     });

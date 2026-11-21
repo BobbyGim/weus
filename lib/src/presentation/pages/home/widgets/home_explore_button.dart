@@ -26,11 +26,11 @@ class HomeExploreButton extends StatelessWidget {
           child: const Icon(LucideIcons.search, size: 20),
         ),
         title: Text(
-          "모임 찾기",
+          "그룹 찾기",
           style: text.titleMedium!.copyWith(fontWeight: FontWeight.w700),
         ),
         subtitle: Text(
-          "관심 있는 모임을 찾아 참여해 보세요",
+          "관심 있는 그룹을 찾아 참여해 보세요",
           style: text.bodyMedium!.copyWith(color: scheme.onSurfaceVariant),
         ),
         trailing: const Icon(

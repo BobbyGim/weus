@@ -233,10 +233,16 @@ ThemeData get appTheme => ThemeData(
     showCheckmark: false,
     backgroundColor: _scheme.surfaceContainer,
     selectedColor: _scheme.secondary,
-    labelStyle: _textTheme.labelMedium?.copyWith(color: _scheme.onSurface),
-    secondaryLabelStyle: _textTheme.labelMedium?.copyWith(
-      color: _scheme.onSecondary,
+    // 고른 칩(ink 배경)은 흰 글씨. FilterChip은 secondaryLabelStyle을 안 써서
+    // 글자색을 상태로 정한다.
+    labelStyle: _textTheme.labelMedium?.copyWith(
+      color: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.white
+            : _scheme.onSurface,
+      ),
     ),
+    secondaryLabelStyle: _textTheme.labelMedium?.copyWith(color: Colors.white),
   ),
 
   // Selected tab is ink, not blue: blue is reserved for actions.

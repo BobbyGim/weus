@@ -15,20 +15,23 @@ class GroupRepositoryImpl implements GroupRepository {
 
   /// RPC가 `raise exception '<코드>'`로 거절하면 이 문구로 바꿔 [GroupFailure]를 던진다.
   static const _failures = {
-    "group_not_found": "초대 코드에 맞는 모임이 없어요",
-    "already_member": "이미 참여한 모임이에요",
-    "owner_has_members": "다른 멤버가 있으면 모임장은 나갈 수 없어요",
+    "group_not_found": "초대 코드에 맞는 그룹이 없어요",
+    "already_member": "이미 참여한 그룹이에요",
+    "owner_has_members": "다른 멤버가 있으면 그룹장은 나갈 수 없어요",
     "request_already_decided": "이미 처리된 신청이에요",
     "request_not_found": "신청을 찾을 수 없어요",
-    "not_owner": "모임장만 할 수 있어요",
+    "not_owner": "그룹장만 할 수 있어요",
     "cannot_remove_self": "자기 자신은 내보낼 수 없어요",
     "invalid_category": "없는 카테고리예요",
     "duplicate_category": "같은 카테고리를 두 번 고를 수 없어요",
   };
 
-  Future<dynamic> _rpc(String fn, [Map<String, dynamic>? params]) async {
+  Future<dynamic> _rpc(String fn, [Map<String, dynamic>? params]) =>
+      _guard(() => _supabase.rpc(fn, params: params));
+
+  Future<T> _guard<T>(Future<T> Function() request) async {
     try {
-      return await _supabase.rpc(fn, params: params);
+      return await request();
     } on PostgrestException catch (e) {
       final message = _failures[e.message];
 
@@ -77,7 +80,7 @@ class GroupRepositoryImpl implements GroupRepository {
         .eq("id", groupId)
         .maybeSingle();
 
-    if (row == null) throw const GroupFailure("모임을 찾을 수 없어요");
+    if (row == null) throw const GroupFailure("그룹을 찾을 수 없어요");
 
     final profiles = {
       for (final p in await _rpc("group_member_profiles", {
@@ -125,6 +128,30 @@ class GroupRepositoryImpl implements GroupRepository {
     "p_is_public": isPublic,
     "p_categories": categories,
   }) as int;
+
+  // RLS·컬럼 권한으로 owner만 바뀐다. 아니면 에러 없이 아무 행도 안 바뀌어서,
+  // 바뀐 행을 돌려받아 비어 있으면 거절로 본다.
+  @override
+  Future<void> update(
+    int groupId, {
+    required String name,
+    required String description,
+    required List<String> categories,
+  }) async {
+    final rows = await _guard(
+      () => _supabase
+          .from("groups")
+          .update({
+            "name": name,
+            "description": description,
+            "categories": categories,
+          })
+          .eq("id", groupId)
+          .select("id"),
+    );
+
+    if (rows.isEmpty) throw const GroupFailure("그룹장만 수정할 수 있어요");
+  }
 
   // RLS·컬럼 권한으로 owner만 바뀐다 (아니면 아무 행도 안 바뀐다).
   @override

@@ -115,6 +115,7 @@ lib/
     │   ├── router.dart             # barrel
     │   ├── app_router.dart         # 라우트 표 (routerProvider)
     │   ├── auth_redirect.dart      # 로그인 여부 redirect
+    │   ├── bottom_sheet_page.dart  # 아래에서 내용만큼 올라오는 바텀시트 페이지
     │   ├── deep_link_redirect.dart # 딥링크 redirect
     │   ├── sheet_page.dart         # 아래에서 올라오는 iOS 시트 페이지
     │   └── app_visibility.dart     # 앱이 화면에 보일 때까지 대기 (onScreen)

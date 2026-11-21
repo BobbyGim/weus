@@ -4,7 +4,6 @@ import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/hooks/hooks.dart";
-import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "view_models/view_models.dart";
@@ -58,7 +57,7 @@ class GroupPreviewPage extends HookConsumerWidget {
           child: data.isLoading
               ? const CircularProgressIndicator()
               : Text(
-                  data.hasError ? "모임을 불러오지 못했어요" : "찾을 수 없는 모임이에요",
+                  data.hasError ? "그룹을 불러오지 못했어요" : "찾을 수 없는 그룹이에요",
                   style: text.titleMedium,
                 ),
         ),
@@ -74,7 +73,7 @@ class GroupPreviewPage extends HookConsumerWidget {
       if (await run(viewModel.request) && context.mounted) {
         showAppSnackBar(
           context,
-          "가입을 신청했어요. 모임장이 수락하면 참여돼요",
+          "가입을 신청했어요. 그룹장이 수락하면 참여돼요",
           icon: LucideIcons.circleCheck,
         );
       }
@@ -103,22 +102,15 @@ class GroupPreviewPage extends HookConsumerWidget {
         scrollController: scrollController,
         content: [
           Text(
-            group.description.isEmpty ? "모임 소개가 없어요" : group.description,
+            group.description.isEmpty ? "그룹 소개가 없어요" : group.description,
             style: text.bodyLarge!.copyWith(
               color: group.description.isEmpty ? scheme.onSurfaceVariant : null,
             ),
           ),
-
-          const SizedBox(height: AppSpacing.xxl),
-
-          Text(
-            "가입 신청하면 모임장이 수락한 뒤 참여할 수 있어요.",
-            style: text.bodyMedium!.copyWith(color: scheme.onSurfaceVariant),
-          ),
         ],
         bottomBar: group.isMember
             ? GroupHeroBottomButton(
-                label: "모임으로 가기",
+                label: "그룹으로 가기",
                 onPressed: () => context.go("/group/${group.id}"),
               )
             : group.isPending

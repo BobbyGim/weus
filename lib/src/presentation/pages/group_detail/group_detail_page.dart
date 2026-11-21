@@ -1,3 +1,8 @@
+import "package:cupertino_ui/cupertino_ui.dart"
+    show
+        CupertinoActionSheet,
+        CupertinoActionSheetAction,
+        showCupertinoModalPopup;
 import "package:go_router/go_router.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
@@ -13,7 +18,7 @@ import "widgets/widgets.dart";
 
 /// 아래에서 올라오는 그룹 상세: 위는 모임 이미지와 제목, 아래 시트에 소개·
 /// 초대 코드·멤버. owner는 가입 신청을 수락·거절하고 멤버를 내보낸다.
-/// 메뉴에서 모임 나가기 (owner는 혼자일 때만, 나가면 모임이 삭제된다).
+/// 메뉴에서 모임 나가기 (owner는 혼자일 때만, 나가면 모임이 삭제된다), owner는 모임 수정도.
 /// 링크(`/group/<id>`)로 열 수 있고, 멤버가 아니면 미리보기로 넘긴다.
 class GroupDetailPage extends HookConsumerWidget {
   const GroupDetailPage({
@@ -70,30 +75,74 @@ class GroupDetailPage extends HookConsumerWidget {
 
     Future<void> leave() async {
       if (detail!.isOwner && detail.members.length > 1) {
-        showAppSnackBar(context, "다른 멤버가 있으면 모임장은 나갈 수 없어요");
+        showAppSnackBar(context, "다른 멤버가 있으면 그룹장은 나갈 수 없어요");
 
         return;
       }
 
       final ok = await confirm(
-        title: deletes ? "모임을 삭제할까요?" : "모임에서 나갈까요?",
+        title: deletes ? "그룹을 삭제할까요?" : "그룹에서 나갈까요?",
         message: deletes
-            ? "모임장이 나가면 모임이 삭제되고, 글과 댓글도 더 이상 볼 수 없어요."
+            ? "그룹장이 나가면 그룹이 삭제되고, 글과 댓글도 더 이상 볼 수 없어요."
             : "나간 뒤에도 초대 코드로 다시 가입 신청할 수 있어요.",
         action: deletes ? "삭제하고 나가기" : "나가기",
       );
 
       if (!ok || !await page.run(viewModel.leave) || !context.mounted) return;
 
-      showAppSnackBar(context, deletes ? "모임을 삭제했어요" : "모임에서 나왔어요");
+      showAppSnackBar(context, deletes ? "그룹을 삭제했어요" : "그룹에서 나왔어요");
 
       context.go("/group");
+    }
+
+    // 모임 수정: 저장하고 돌아오면(true) 바뀐 내용으로 다시 불러온다.
+    Future<void> edit() async {
+      final saved = await context.push<bool>("/group/$groupId/edit");
+
+      if (saved == true) viewModel.refresh();
+    }
+
+    // ⋮: 모임장이면 수정·나가기를 고르는 시트, 멤버는 바로 나가기 확인.
+    Future<void> openMenu() async {
+      if (!detail!.isOwner) return leave();
+
+      final choice = await showCupertinoModalPopup<String>(
+        context: context,
+        builder: (context) => CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(context).pop("edit"),
+              child: const Text("수정"),
+            ),
+
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(context).pop("leave"),
+              child: Text(deletes ? "그룹 삭제하고 나가기" : "나가기"),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("닫기"),
+          ),
+        ),
+      );
+
+      if (!context.mounted) return;
+
+      switch (choice) {
+        case "edit":
+          await edit();
+
+        case "leave":
+          await leave();
+      }
     }
 
     Future<void> remove(GroupMember member) async {
       final ok = await confirm(
         title: "${member.name}님을 내보낼까요?",
-        message: "내보낸 뒤에도 다시 가입 신청할 수 있고, 받을지는 모임장이 정해요.",
+        message: "내보낸 뒤에도 다시 가입 신청할 수 있고, 받을지는 그룹장이 정해요.",
         action: "내보내기",
       );
 
@@ -116,7 +165,7 @@ class GroupDetailPage extends HookConsumerWidget {
       if (done && context.mounted) {
         showAppSnackBar(
           context,
-          approve ? "${request.name}님이 모임에 들어왔어요" : "가입 신청을 거절했어요",
+          approve ? "${request.name}님이 그룹에 들어왔어요" : "가입 신청을 거절했어요",
         );
       }
     }
@@ -184,7 +233,7 @@ class GroupDetailPage extends HookConsumerWidget {
                     Text(
                       data.error is GroupFailure
                           ? (data.error! as GroupFailure).message
-                          : "모임을 불러오지 못했어요",
+                          : "그룹을 불러오지 못했어요",
                       style: text.titleMedium,
                     ),
 
@@ -222,20 +271,20 @@ class GroupDetailPage extends HookConsumerWidget {
         action: GroupHeroButton(
           icon: LucideIcons.ellipsisVertical,
           tooltip: "메뉴",
-          onPressed: leave,
+          onPressed: openMenu,
         ),
         content: [
           if (current.isOwner) ...[
             Align(
               alignment: Alignment.centerLeft,
-              child: pill(LucideIcons.crown, "내가 모임장"),
+              child: pill(LucideIcons.crown, "내가 그룹장"),
             ),
 
             const SizedBox(height: AppSpacing.xl),
           ],
 
           Text(
-            current.description.isEmpty ? "모임 소개가 없어요" : current.description,
+            current.description.isEmpty ? "그룹 소개가 없어요" : current.description,
             style: text.bodyLarge!.copyWith(
               color: current.description.isEmpty
                   ? scheme.onSurfaceVariant
@@ -277,10 +326,10 @@ class GroupDetailPage extends HookConsumerWidget {
                 value: current.isPublic,
                 onChanged: (value) =>
                     page.run(() => viewModel.setPublic(value)),
-                title: Text("공개 모임", style: text.titleMedium),
+                title: Text("공개 그룹", style: text.titleMedium),
                 subtitle: Text(
                   current.isPublic
-                      ? "모임 찾기에서 누구나 찾고 가입 신청할 수 있어요"
+                      ? "그룹 찾기에서 누구나 찾고 가입 신청할 수 있어요"
                       : "초대 코드를 받은 사람만 가입 신청할 수 있어요",
                   style: text.bodyMedium!.copyWith(
                     color: scheme.onSurfaceVariant,

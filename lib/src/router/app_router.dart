@@ -7,6 +7,7 @@ import "package:weus/src/presentation/pages/pages.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "auth_redirect.dart";
+import "bottom_sheet_page.dart";
 import "deep_link_redirect.dart";
 import "sheet_page.dart";
 
@@ -131,6 +132,20 @@ GoRouter router(Ref ref) {
                         scrollController: controller,
                       ),
                     ),
+                    routes: [
+                      // 모임 수정 (모임장만, 상세의 메뉴에서). 일정 등록처럼 바텀시트.
+                      GoRoute(
+                        path: "edit",
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (_, state) => BottomSheetPage(
+                          key: state.pageKey,
+                          builder: (_) => GroupEditPage(
+                            groupId:
+                                int.tryParse(state.pathParameters["id"]!) ?? 0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

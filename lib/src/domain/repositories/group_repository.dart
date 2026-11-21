@@ -23,6 +23,14 @@ abstract interface class GroupRepository {
     required String clientId,
   });
 
+  /// owner만. 이름·소개·카테고리를 바꾼다. owner가 아니면 [GroupFailure].
+  Future<void> update(
+    int groupId, {
+    required String name,
+    required String description,
+    required List<String> categories,
+  });
+
   /// owner만. 공개 여부를 바꾼다.
   Future<void> setPublic(int groupId, bool isPublic);
 

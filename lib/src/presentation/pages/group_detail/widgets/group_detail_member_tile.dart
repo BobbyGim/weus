@@ -50,7 +50,7 @@ class GroupDetailMemberTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.full),
               ),
               child: Text(
-                "모임장",
+                "그룹장",
                 style: text.labelSmall!.copyWith(
                   color: scheme.onPrimaryContainer,
                 ),

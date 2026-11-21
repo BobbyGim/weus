@@ -126,14 +126,14 @@ class GroupPage extends ConsumerWidget {
                 ],
 
                 heading(
-                  "내 모임",
+                  "내 그룹",
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextButton.icon(
                         onPressed: () => context.go("/group/explore"),
                         icon: const Icon(LucideIcons.search, size: 18),
-                        label: const Text("모임 찾기"),
+                        label: const Text("그룹 찾기"),
                       ),
 
                       TextButton.icon(
@@ -151,7 +151,7 @@ class GroupPage extends ConsumerWidget {
                       vertical: AppSpacing.xxl,
                     ),
                     child: Text(
-                      "아직 참여한 모임이 없어요",
+                      "아직 참여한 그룹이 없어요",
                       textAlign: TextAlign.center,
                       style: text.bodyMedium!.copyWith(
                         color: scheme.onSurfaceVariant,
@@ -195,7 +195,7 @@ class GroupPage extends ConsumerWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("모임을 불러오지 못했어요", style: text.titleMedium),
+            Text("그룹을 불러오지 못했어요", style: text.titleMedium),
 
             const SizedBox(height: AppSpacing.sm),
 

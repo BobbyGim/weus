@@ -84,8 +84,8 @@ class GroupExplorePage extends HookConsumerWidget {
     final list = switch (results.value) {
       (groups: [], hasMore: _, loadingMore: _, failed: _) => message(
         query.isEmpty && page.category == null
-            ? "참여할 수 있는 모임이 없어요"
-            : "조건에 맞는 모임이 없어요",
+            ? "참여할 수 있는 그룹이 없어요"
+            : "조건에 맞는 그룹이 없어요",
       ),
 
       (:final groups, :final hasMore, loadingMore: _, :final failed) =>
@@ -142,7 +142,7 @@ class GroupExplorePage extends HookConsumerWidget {
                                   const SizedBox(height: AppSpacing.md),
 
                                   Text(
-                                    "모임을 더 불러오는 중",
+                                    "그룹을 더 불러오는 중",
                                     style: text.bodyMedium!.copyWith(
                                       color: scheme.onSurfaceVariant,
                                     ),
@@ -156,7 +156,7 @@ class GroupExplorePage extends HookConsumerWidget {
         ),
 
       null when results.hasError => message(
-        "모임을 불러오지 못했어요",
+        "그룹을 불러오지 못했어요",
         action: TextButton(
           onPressed: viewModel.refresh,
           child: const Text("다시 시도"),
@@ -168,12 +168,12 @@ class GroupExplorePage extends HookConsumerWidget {
 
     return AppLoadingOverlay(
       loading: page.busy,
-      label: "모임 불러오는 중",
+      label: "그룹 불러오는 중",
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: const AppBackButton(fallback: "/group"),
-          title: const Text("모임 찾기"),
+          title: const Text("그룹 찾기"),
         ),
         body: Column(
           children: [
@@ -190,7 +190,7 @@ class GroupExplorePage extends HookConsumerWidget {
                 textInputAction: TextInputAction.search,
                 onSubmitted: (_) => search(),
                 decoration: const InputDecoration(
-                  hintText: "모임 이름으로 검색",
+                  hintText: "그룹 이름으로 검색",
                   prefixIcon: Icon(
                     LucideIcons.search,
                     size: 20,
