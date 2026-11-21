@@ -49,6 +49,47 @@ flutter build ipa --flavor prod -t lib/main_prod.dart
 
 ---
 
+## Navigation & Deep Links
+
+라우트는 `lib/src/router/app_router.dart`에 모여 있습니다. 화면은 두 종류입니다.
+
+| 종류 | 예 | 여는 방법 | 닫으면 |
+|---|---|---|---|
+| 탭 | `/`, `/schedule`, `/group`, `/mypage` | 하단 탭 | - (탭마다 상태 유지, 탭을 누르면 맨 위로 스크롤) |
+| 탭 위 전체 화면 | `/mypage/info`, `/group/new`, `/group/join`, `/group/explore`, `/group/explore/:id`, `/group/:id` | `context.go` (자기 탭 아래 라우트) | 그 탭으로 |
+
+- 전체 화면은 자기 탭의 하위 라우트라 `context.go`로 열면 그 탭 위에 쌓입니다. 다른 탭에서 열 때는 `context.push`로 지금 화면 위에 쌓습니다 (홈의 "모임 찾기"는 홈 위에 열리고 닫으면 홈, 같은 주소를 딥링크로 열면 모임 탭 위).
+- 모임 미리보기(`/group/explore/:id`)와 그룹 상세(`/group/:id`)는 아래에서 올라오는 iOS 시트입니다 (아래로 끌면 닫힘).
+- 모임 찾기 검색어는 주소 쿼리로 남습니다 (`/group/explore?q=러닝`). 검색할 때는 `replace`라 뒤로가기에 검색 기록이 쌓이지 않습니다.
+
+### 딥링크로 열 때
+
+주소는 `<scheme>://app/<route>` 입니다 (scheme은 위 flavor 표).
+
+- 앱이 켜져 있으면 그 주소로 이동합니다 (전체 화면은 자기 탭 위에 쌓임).
+- 앱이 화면에 없을 때(콜드 스타트, 백그라운드에서 복귀)는 `deepLinkRedirect`가 그 탭을 먼저 띄우고, 앱이 보이면 페이지가 슬라이드로 들어옵니다 (`lib/src/router/deep_link_redirect.dart`).
+- 로그인 전에 들어온 딥링크는 로그인 화면으로 갑니다.
+- 그룹 상세 링크를 멤버가 아닌 사람이 열면 미리보기로 바뀝니다 (공개 모임이면 가입 신청, 아니면 없는 모임).
+
+### 딥링크 테스트
+
+```bash
+# 시뮬레이터 (simctl은 시뮬레이터에서만 동작)
+xcrun simctl openurl booted "weus-staging://app/group/explore"
+
+# 실기기 (Mac에 연결된 iPhone, 기기 ID는 `xcrun xctrace list devices`)
+xcrun devicectl device process launch --device <기기 ID> \
+  --payload-url "weus-staging://app/group/explore" com.weus.weus.staging
+
+# Android
+adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/explore"
+```
+
+- 한글 검색어는 인코딩해서 넣으세요 (`?q=%EC%9A%94%EA%B0%80` = 요가).
+- 실기기에서는 Safari 주소창에 주소를 입력해도 열립니다.
+
+---
+
 ## Architecture Overview
 
 레이어 우선(layer-first) 클린 아키텍처에 MVVM을 얹은 구조입니다.
@@ -75,6 +116,7 @@ lib/
     │   ├── app_router.dart         # 라우트 표 (routerProvider)
     │   ├── auth_redirect.dart      # 로그인 여부 redirect
     │   ├── deep_link_redirect.dart # 딥링크 redirect
+    │   ├── sheet_page.dart         # 아래에서 올라오는 iOS 시트 페이지
     │   └── app_visibility.dart     # 앱이 화면에 보일 때까지 대기 (onScreen)
     ├── utils/                # 어느 레이어에서나 쓰는 순수 Dart 헬퍼
     ├── domain/

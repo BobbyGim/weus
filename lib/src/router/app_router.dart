@@ -1,4 +1,5 @@
 import "package:cupertino_ui/cupertino_ui.dart";
+import "package:flutter/foundation.dart";
 import "package:go_router/go_router.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 import "package:weus/src/data/data.dart";
@@ -7,6 +8,7 @@ import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "auth_redirect.dart";
 import "deep_link_redirect.dart";
+import "sheet_page.dart";
 
 part "app_router.g.dart";
 
@@ -26,6 +28,8 @@ GoRouter router(Ref ref) {
 
   router = GoRouter(
     navigatorKey: rootKey,
+    // 디버그 빌드에서 go·push·redirect를 콘솔에 찍는다.
+    debugLogDiagnostics: kDebugMode,
     redirect: (context, state) =>
         toAuth(context, state) ?? toDeepLink(context, state),
     routes: [
@@ -65,7 +69,71 @@ GoRouter router(Ref ref) {
 
           StatefulShellBranch(
             routes: [
-              GoRoute(path: "/meeting", builder: (_, _) => const MeetingPage()),
+              GoRoute(
+                path: "/group",
+                builder: (_, _) => const GroupPage(),
+                routes: [
+                  GoRoute(
+                    path: "new",
+                    parentNavigatorKey: rootKey,
+                    pageBuilder: (_, state) => CupertinoPage(
+                      key: state.pageKey,
+                      child: const GroupCreatePage(),
+                    ),
+                  ),
+
+                  GoRoute(
+                    path: "join",
+                    parentNavigatorKey: rootKey,
+                    pageBuilder: (_, state) => CupertinoPage(
+                      key: state.pageKey,
+                      child: const GroupJoinPage(),
+                    ),
+                  ),
+
+                  GoRoute(
+                    path: "explore",
+                    parentNavigatorKey: rootKey,
+                    pageBuilder: (_, state) => CupertinoPage(
+                      key: state.pageKey,
+                      // 검색어는 주소의 쿼리로 (?q=러닝).
+                      child: GroupExplorePage(
+                        query: state.uri.queryParameters["q"] ?? "",
+                      ),
+                    ),
+                    routes: [
+                      // 모임 미리보기는 아래에서 올라오는 iOS 시트 (아래로 끌면 닫힌다).
+                      GoRoute(
+                        path: ":id",
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (_, state) => SheetPage(
+                          key: state.pageKey,
+                          builder: (_, controller) => GroupPreviewPage(
+                            // 숫자가 아니면 없는 모임으로 연다.
+                            groupId:
+                                int.tryParse(state.pathParameters["id"]!) ?? 0,
+                            scrollController: controller,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // new·join·explore보다 뒤에 둬야 그 경로가 id로 잡히지 않는다.
+                  GoRoute(
+                    path: ":id",
+                    parentNavigatorKey: rootKey,
+                    pageBuilder: (_, state) => SheetPage(
+                      key: state.pageKey,
+                      builder: (_, controller) => GroupDetailPage(
+                        // 숫자가 아니면 없는 모임으로 연다.
+                        groupId: int.tryParse(state.pathParameters["id"]!) ?? 0,
+                        scrollController: controller,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
 
@@ -104,6 +172,15 @@ GoRouter router(Ref ref) {
       ),
     ],
   );
+
+  // 디버그 빌드에서 이동이 끝날 때마다 현재 주소를 찍는다.
+  if (kDebugMode) {
+    router.routerDelegate.addListener(
+      () => debugPrint(
+        "[router] ${router.routerDelegate.currentConfiguration.uri}",
+      ),
+    );
+  }
 
   // 로그인·로그아웃하면 redirect를 다시 돌려 로그인 화면과 홈 사이를 옮긴다.
   final signedIn = auth.watchSignedIn().listen((_) => router.refresh());

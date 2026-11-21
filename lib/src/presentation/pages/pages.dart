@@ -1,5 +1,10 @@
+export "group/group.dart";
+export "group_create/group_create.dart";
+export "group_detail/group_detail.dart";
+export "group_explore/group_explore.dart";
+export "group_join/group_join.dart";
+export "group_preview/group_preview.dart";
 export "home/home.dart";
-export "meeting/meeting.dart";
 export "my/my.dart";
 export "my_info/my_info.dart";
 export "notification_settings/notification_settings.dart";
