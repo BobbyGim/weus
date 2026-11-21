@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:flutter/services.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -26,7 +28,58 @@ Future<void> bootstrap(String flavor) async {
   // Korean month/weekday names for DateFormat (the schedule calendar).
   await initializeDateFormatting("ko_KR");
 
+  await _precacheImages();
+
   runApp(const ProviderScope(child: MyApp()));
+}
+
+/// assets/image/ 아래 PNG를 네이티브 스플래시가 떠 있는 동안 미리 디코딩해 둔다.
+/// 어느 화면이든 처음 열릴 때 이미지가 빈 프레임 없이 바로 보인다.
+/// SVG는 캐시 키가 화면의 글자 크기를 포함해서 여기서 미리 넣어도 맞지 않는다.
+Future<void> _precacheImages() async {
+  final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+
+  final config = ImageConfiguration(
+    bundle: rootBundle,
+    devicePixelRatio: WidgetsBinding
+        .instance
+        .platformDispatcher
+        .implicitView
+        ?.devicePixelRatio,
+  );
+
+  final paths = manifest.listAssets().where(
+    (path) => path.startsWith("assets/image/") && path.endsWith(".png"),
+  );
+
+  await Future.wait([
+    for (final path in paths) _precache(AssetImage(path), config),
+  ]);
+}
+
+/// precacheImage와 같은 일을 BuildContext 없이 한다. 실패해도 앱 시작은 막지 않는다.
+Future<void> _precache(ImageProvider image, ImageConfiguration config) {
+  final done = Completer<void>();
+
+  final stream = image.resolve(config);
+
+  late final ImageStreamListener listener;
+
+  void finish() {
+    if (!done.isCompleted) done.complete();
+
+    // 리스너를 떼도 이미지는 ImageCache에 남는다.
+    stream.removeListener(listener);
+  }
+
+  listener = ImageStreamListener(
+    (_, _) => finish(),
+    onError: (_, _) => finish(),
+  );
+
+  stream.addListener(listener);
+
+  return done.future;
 }
 
 class MyApp extends ConsumerWidget {
@@ -36,6 +89,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Still unknown at launch counts as online.
     final offline = ref.watch(offlineProvider).value ?? false;
+
+    // 로그인돼 있으면 앱을 켜자마자 프로필을 뒤에서 불러온다 (화면은 기다리지 않음).
+    ref.listen(myProfileProvider, (_, _) {});
 
     return MaterialApp.router(
       title: "위어스",

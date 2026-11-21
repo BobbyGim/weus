@@ -70,25 +70,29 @@ class SignInPage extends HookConsumerWidget {
                         Expanded(
                           child: Center(
                             // 스플래시처럼 로고 마크 아래에 워드마크 "WeUs".
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  "assets/image/logo_mark.png",
-                                  height: 88 * logoScale,
-                                  excludeFromSemantics: true,
-                                ),
-
-                                SizedBox(height: AppSpacing.lg * logoScale),
-
-                                Text(
-                                  "WeUs",
-                                  style: text.displaySmall!.copyWith(
-                                    fontSize: 28 * logoScale,
-                                    fontWeight: FontWeight.w800,
+                            // dev·staging은 7번 누르면 테스트 계정이 채워진다.
+                            child: GestureDetector(
+                              onTap: form.onLogoTap,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    "assets/image/logo_mark.png",
+                                    height: 88 * logoScale,
+                                    excludeFromSemantics: true,
                                   ),
-                                ),
-                              ],
+
+                                  SizedBox(height: AppSpacing.lg * logoScale),
+
+                                  Text(
+                                    "WeUs",
+                                    style: text.displaySmall!.copyWith(
+                                      fontSize: 28 * logoScale,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
