@@ -102,13 +102,19 @@ class MyApp extends ConsumerWidget {
       routerConfig: ref.watch(routerProvider),
       // The router stays mounted under the offline page, so reconnecting
       // lands back on the same screen with its state.
-      builder: (_, child) => Stack(
-        children: [
-          ExcludeSemantics(excluding: offline, child: child),
+      // 입력칸 밖(빈 곳)을 누르면 키보드를 내린다. Flutter는 모바일에서 기본으로 안 해준다.
+      // 버튼·입력칸을 누르면 그쪽이 탭을 가져가서 여기는 빈 곳을 눌렀을 때만 불린다.
+      builder: (_, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Stack(
+          children: [
+            ExcludeSemantics(excluding: offline, child: child),
 
-          if (offline)
-            OfflinePage(onRetry: () => ref.invalidate(offlineProvider)),
-        ],
+            if (offline)
+              OfflinePage(onRetry: () => ref.invalidate(offlineProvider)),
+          ],
+        ),
       ),
     );
   }

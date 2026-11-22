@@ -90,6 +90,46 @@ adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/ex
 
 ---
 
+## Forms & Keyboard
+
+입력 화면은 키보드를 다루는 방식이 두 가지입니다. 화면에 맞게 고르세요.
+
+| 방식 | 쓰는 화면 | 키보드가 올라오면 |
+|---|---|---|
+| **화면 고정** (네이버 로그인처럼) | 로그인 (`sign_in_page.dart`) | 화면은 그대로, 키보드가 아래쪽을 덮음 |
+| **버튼이 키보드 위로** | 회원가입, 그룹 만들기·수정, 코드로 참여 | 화면이 줄어들고 맨 아래 버튼이 키보드 바로 위로 올라옴 (가려지면 스크롤) |
+
+### 화면 고정 (로그인)
+
+```
+┌──────────────┐
+│ 로고          │ ┐ 위 묶음: 위에서부터 쌓음 (화면 위쪽 절반 안)
+│ 이메일        │ │ 로고만 남는 공간에 맞춰 줄어듦 (Flexible + FittedBox)
+│ 비밀번호      │ │
+│ 로그인 버튼   │ ┘
+│              │
+│ 소셜 로그인   │ ┐ 아래 묶음: 항상 맨 아래 (키보드가 덮어도 되는 것만)
+│ 회원가입      │ ┘
+└──────────────┘
+```
+
+- `Scaffold(resizeToAvoidBottomInset: false)`: 키보드가 올라와도 화면을 줄이지 않습니다.
+- 스크롤 뷰 없이 `Column(mainAxisAlignment: spaceBetween)`으로 위·아래 묶음을 나눕니다. 위 묶음은 `Flexible` 안의 `Column(mainAxisSize: min)`이고, 그 안의 로고를 `Flexible` + `FittedBox(fit: BoxFit.scaleDown)`로 감싸 공간이 모자라면 로고만 줄어듭니다. 그래서 어떤 화면에서도 오버플로가 나지 않습니다.
+- 키보드에 가리면 안 되는 것(입력칸, 주 버튼)은 위 묶음에, 가려져도 되는 것(소셜 로그인, 링크)은 아래 묶음에 둡니다.
+- 아주 작은 화면(iPhone SE 1세대)에서는 주 버튼이 키보드에 걸칠 수 있습니다. 마지막 입력칸에 `textInputAction: done` + `onSubmitted`를 달아 키보드의 완료로도 제출되게 합니다.
+
+### 버튼이 키보드 위로 (그 밖의 입력 화면)
+
+- `CustomScrollView` + `SliverFillRemaining(hasScrollBody: false)` 안에 `Column`, 입력칸 뒤에 `Spacer`와 버튼을 둡니다.
+- 화면에 다 들어가면 스크롤되지 않고(`ClampingScrollPhysics`), 키보드에 가려질 때만 스크롤됩니다.
+
+### 공통
+
+- **입력칸 밖을 누르면 키보드가 내려갑니다.** `main.dart`의 `MaterialApp.router` builder에서 앱 전체에 한 번 처리합니다 (Flutter는 모바일에서 기본으로 안 해 줌). 버튼·입력칸을 누르면 그쪽이 탭을 가져가서 영향이 없습니다.
+- 바텀시트 안의 폼(그룹 수정, 일정 등록)은 `MediaQuery.viewInsetsOf(context).bottom`만큼 아래를 띄워 버튼을 키보드 위에 둡니다.
+
+---
+
 ## Architecture Overview
 
 레이어 우선(layer-first) 클린 아키텍처에 MVVM을 얹은 구조입니다.
