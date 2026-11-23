@@ -56,7 +56,7 @@ flutter build ipa --flavor prod -t lib/main_prod.dart
 | 종류 | 예 | 여는 방법 | 닫으면 |
 |---|---|---|---|
 | 탭 | `/`, `/schedule`, `/group`, `/mypage` | 하단 탭 | - (탭마다 상태 유지, 탭을 누르면 맨 위로 스크롤) |
-| 탭 위 전체 화면 | `/mypage/info`, `/group/new`, `/group/join`, `/group/explore`, `/group/explore/:id`, `/group/:id` | `context.go` (자기 탭 아래 라우트) | 그 탭으로 |
+| 탭 위 전체 화면 | `/mypage/info`, `/group/new`, `/group/join`, `/group/explore`, `/group/explore/:id`, `/group/:id`, `/group/:id/settings`, `/group/:id/post/new`, `/group/:id/post/:postId` | `context.go` (자기 탭 아래 라우트) | 그 탭으로 |
 
 - 전체 화면은 자기 탭의 하위 라우트라 `context.go`로 열면 그 탭 위에 쌓입니다. 다른 탭에서 열 때는 `context.push`로 지금 화면 위에 쌓습니다 (홈의 "모임 찾기"는 홈 위에 열리고 닫으면 홈, 같은 주소를 딥링크로 열면 모임 탭 위).
 - 모임 미리보기(`/group/explore/:id`)와 그룹 상세(`/group/:id`)는 아래에서 올라오는 iOS 시트입니다 (아래로 끌면 닫힘).
@@ -103,8 +103,8 @@ adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/ex
 
 ```
 ┌──────────────┐
-│ 로고          │ ┐ 위 묶음: 위에서부터 쌓음 (화면 위쪽 절반 안)
-│ 이메일        │ │ 로고만 남는 공간에 맞춰 줄어듦 (Flexible + FittedBox)
+│ 로고          │ ┐ 위 묶음: 아래 묶음을 뺀 나머지 높이 전부
+│ 이메일        │ │ 로고는 남는 높이 가운데, 모자라면 줄어듦
 │ 비밀번호      │ │
 │ 로그인 버튼   │ ┘
 │              │
@@ -114,7 +114,7 @@ adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/ex
 ```
 
 - `Scaffold(resizeToAvoidBottomInset: false)`: 키보드가 올라와도 화면을 줄이지 않습니다.
-- 스크롤 뷰 없이 `Column(mainAxisAlignment: spaceBetween)`으로 위·아래 묶음을 나눕니다. 위 묶음은 `Flexible` 안의 `Column(mainAxisSize: min)`이고, 그 안의 로고를 `Flexible` + `FittedBox(fit: BoxFit.scaleDown)`로 감싸 공간이 모자라면 로고만 줄어듭니다. 그래서 어떤 화면에서도 오버플로가 나지 않습니다.
+- 스크롤 뷰 없이 `Column`으로 위·아래 묶음을 나눕니다. 위 묶음은 `Expanded` 안의 `Column`이고, 그 안의 로고를 `Expanded` + `FittedBox(fit: BoxFit.scaleDown)`로 감싸 로고가 남는 높이의 가운데에 원래 크기로 놓이고, 공간이 모자라면 로고만 줄어듭니다. 그래서 어떤 화면에서도 오버플로가 나지 않습니다.
 - 키보드에 가리면 안 되는 것(입력칸, 주 버튼)은 위 묶음에, 가려져도 되는 것(소셜 로그인, 링크)은 아래 묶음에 둡니다.
 - 아주 작은 화면(iPhone SE 1세대)에서는 주 버튼이 키보드에 걸칠 수 있습니다. 마지막 입력칸에 `textInputAction: done` + `onSubmitted`를 달아 키보드의 완료로도 제출되게 합니다.
 
@@ -122,6 +122,7 @@ adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/ex
 
 - `CustomScrollView` + `SliverFillRemaining(hasScrollBody: false)` 안에 `Column`, 입력칸 뒤에 `Spacer`와 버튼을 둡니다.
 - 화면에 다 들어가면 스크롤되지 않고(`ClampingScrollPhysics`), 키보드에 가려질 때만 스크롤됩니다.
+- 그룹 만들기는 버튼이 항상 보이도록 `Column` 안에 `Expanded(ListView)`(입력칸)와 버튼을 두어, 입력칸만 스크롤되고 버튼은 맨 아래에 고정됩니다.
 
 ### 공통
 
