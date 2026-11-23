@@ -54,9 +54,10 @@ Remote is `https://BobbyGim@github.com/BobbyGim/weus.git` — the username in th
 
 ## Rules
 
-- UI 작업(화면/위젯 디자인, 리디자인)을 할 때는 `taste-skill:design-taste-frontend` 스킬을 먼저 로드해서 따른다.
-- UI/UX 작업(화면·위젯 구현, 애니메이션, 반응형 레이아웃, 테마)을 할 때는 `flutter-ui-ux` 스킬도 함께 로드해서 따른다.
-- UI/UX 작업을 할 때는 `ui-ux-pro-max:ui-ux-pro-max` 스킬도 함께 로드해서 따른다 (Flutter 스택 가이드 기준).
+- UI/UX 작업(화면·위젯 디자인·구현, 리디자인, 애니메이션, 반응형 레이아웃, 테마)을 할 때는 세 스킬을 함께 로드해서 따른다:
+  - `ui-ux-pro-max:ui-ux-pro-max`: 팔레트·UX 규칙 근거 (Flutter 스택 가이드 기준)
+  - `impeccable:impeccable`: AI 티 나는 패턴 점검과 다듬기 (앱 화면은 Operate 모드)
+  - `flutter-ui-ux`: Flutter 구현 가이드
 - 코드를 작성/수정/리팩터링할 때는 `ponytail:ponytail` 스킬을 적용한다.
 - 테스트 코드(`test/`, 위젯/유닛/골든 테스트 등)는 작성하지 않는다. 검증은 `flutter analyze`와 빌드/실행으로 한다. (ponytail의 "runnable check" 규칙보다 우선)
 - 코드 주석(`//`, `///`)의 설명은 한글로 쓴다.
