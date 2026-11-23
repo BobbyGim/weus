@@ -56,9 +56,11 @@ Remote is `https://BobbyGim@github.com/BobbyGim/weus.git` — the username in th
 
 - UI 작업(화면/위젯 디자인, 리디자인)을 할 때는 `taste-skill:design-taste-frontend` 스킬을 먼저 로드해서 따른다.
 - UI/UX 작업(화면·위젯 구현, 애니메이션, 반응형 레이아웃, 테마)을 할 때는 `flutter-ui-ux` 스킬도 함께 로드해서 따른다.
+- UI/UX 작업을 할 때는 `ui-ux-pro-max:ui-ux-pro-max` 스킬도 함께 로드해서 따른다 (Flutter 스택 가이드 기준).
 - 코드를 작성/수정/리팩터링할 때는 `ponytail:ponytail` 스킬을 적용한다.
 - 테스트 코드(`test/`, 위젯/유닛/골든 테스트 등)는 작성하지 않는다. 검증은 `flutter analyze`와 빌드/실행으로 한다. (ponytail의 "runnable check" 규칙보다 우선)
 - 코드 주석(`//`, `///`)의 설명은 한글로 쓴다.
+- 페이지·위젯의 `build`에는 UI(위젯 배치, 분기, 스타일)만 둔다. 로직(provider watch/listen, 파생 값, 콜백, 내비게이션, 컨트롤러, 로컬 상태)은 페이지/위젯 옆 `hooks/`의 `use<Name>()` 훅으로 옮기고, `ref`가 필요하면 `use<Name>(ref, …)`로 넘긴다 (예: `useGroupDetailPage(ref, groupId)`). 콜백 하나뿐인 아주 작은 위젯은 예외.
 
 <!-- 프로젝트 규칙을 여기에 추가하세요. 예:
 - 응답은 한국어로
