@@ -1,10 +1,8 @@
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
-import "package:weus/src/data/data.dart";
 import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
-import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "hooks/hooks.dart";
 
@@ -37,9 +35,7 @@ class ScheduleAddSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final form = useScheduleAddSheet(schedule);
-
-    final editing = schedule;
+    final form = useScheduleAddSheet(ref, schedule);
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -91,24 +87,6 @@ class ScheduleAddSheet extends HookConsumerWidget {
       ),
     );
 
-    void save() {
-      final schedules = ref.read(schedulesProvider.notifier);
-
-      if (editing == null) {
-        schedules.add(form.schedule());
-      } else {
-        schedules.edit(editing.id, form.schedule());
-      }
-
-      showAppSnackBar(
-        context,
-        editing == null ? "일정을 등록했어요" : "일정을 수정했어요",
-        icon: LucideIcons.circleCheck,
-      );
-
-      Navigator.of(context).pop();
-    }
-
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
@@ -128,11 +106,11 @@ class ScheduleAddSheet extends HookConsumerWidget {
                   child: NavigationToolbar(
                     leading: IconButton(
                       tooltip: "닫기",
-                      onPressed: Navigator.of(context).pop,
+                      onPressed: form.close,
                       icon: const Icon(LucideIcons.x),
                     ),
                     middle: Text(
-                      editing == null ? "일정 등록" : "일정 수정",
+                      form.editing ? "일정 수정" : "일정 등록",
                       style: text.titleMedium,
                     ),
                   ),
@@ -184,7 +162,7 @@ class ScheduleAddSheet extends HookConsumerWidget {
                   AppSpacing.lg,
                 ),
                 child: FilledButton(
-                  onPressed: form.canSave ? save : null,
+                  onPressed: form.canSave ? form.save : null,
                   child: const Text("저장"),
                 ),
               ),

@@ -217,14 +217,12 @@ ThemeData get appTheme => ThemeData(
     ),
   ),
 
+  // 테두리 없이 옅은 회색 면으로만 구분한다 (흰 카드 + 회색 테두리는 쓰지 않음).
   cardTheme: CardThemeData(
-    color: _scheme.surfaceContainerLowest,
+    color: _scheme.surfaceContainer,
     elevation: 0,
     margin: .zero,
-    shape: RoundedRectangleBorder(
-      borderRadius: .circular(AppRadius.lg),
-      side: BorderSide(color: _scheme.outlineVariant),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: .circular(AppRadius.lg)),
   ),
 
   chipTheme: ChipThemeData(

@@ -3,8 +3,12 @@ import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 /// 멤버 한 줄: 이름, 닉네임, 모임장·나 표시. [onRemove]가 있으면 내보내기 버튼.
-class GroupDetailMemberTile extends StatelessWidget {
-  const GroupDetailMemberTile({super.key, required this.member, this.onRemove});
+class GroupSettingsMemberTile extends StatelessWidget {
+  const GroupSettingsMemberTile({
+    super.key,
+    required this.member,
+    this.onRemove,
+  });
 
   final GroupMember member;
 

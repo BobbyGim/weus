@@ -1,6 +1,8 @@
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
+import "package:weus/src/data/data.dart";
 import "package:weus/src/domain/domain.dart";
 import "package:weus/src/utils/utils.dart";
 
@@ -126,8 +128,10 @@ List<ScheduleLabel?> _labelsOn(
   ];
 }
 
-/// Calendar starts on, and selects, today's KST date.
+/// Calendar starts on, and selects, today's KST date. 일정을 아직 못 불러왔으면
+/// [loading] (실패하면 빈 달력).
 ({
+  bool loading,
   DateTime today,
   DateTime focusedDay,
   DateTime selectedDay,
@@ -135,7 +139,11 @@ List<ScheduleLabel?> _labelsOn(
   OnDaySelected onDaySelected,
   void Function(DateTime day) onPageChanged,
 })
-useSchedulePage(List<Schedule> schedules) {
+useSchedulePage(WidgetRef ref) {
+  final data = ref.watch(schedulesProvider);
+
+  final schedules = data.value ?? const <Schedule>[];
+
   final today = formatKstToday();
 
   final multiDayRows = useMemoized(() => _rowsOf(schedules), [schedules]);
@@ -157,6 +165,7 @@ useSchedulePage(List<Schedule> schedules) {
   );
 
   return (
+    loading: !data.hasValue && !data.hasError,
     today: today,
     focusedDay: focusedDay.value,
     selectedDay: selectedDay.value,

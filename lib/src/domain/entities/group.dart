@@ -58,3 +58,28 @@ typedef JoinRequest = ({
   String nickname,
   DateTime createdAt,
 });
+
+/// 그룹 홈 맨 위: 이름, [categories]([GroupCategory.id] 목록), 멤버 수.
+typedef GroupHeader = ({String name, List<String> categories, int memberCount});
+
+/// 그룹 홈 게시판 한 줄. [authorName]은 탈퇴한 사람이면 "알 수 없음", [isMine]이면
+/// 내가 쓴 글. [commentCount]는 답글을 포함한, 삭제되지 않은 댓글 수.
+typedef GroupPostSummary = ({
+  int id,
+  String title,
+  String authorName,
+  bool isMine,
+  int commentCount,
+  DateTime createdAt,
+});
+
+/// 글 상세. [authorName]·[isMine]은 [GroupPostSummary]와 같고,
+/// [description]은 비어 있을 수 있다.
+typedef GroupPost = ({
+  int id,
+  String authorName,
+  bool isMine,
+  String title,
+  String description,
+  DateTime createdAt,
+});

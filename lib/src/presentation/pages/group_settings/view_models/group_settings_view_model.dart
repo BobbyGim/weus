@@ -2,12 +2,12 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 import "package:weus/src/data/data.dart";
 import "package:weus/src/domain/domain.dart";
 
-part "group_detail_view_model.g.dart";
+part "group_settings_view_model.g.dart";
 
-/// 그룹 상세와 (owner면) 들어온 가입 신청. 요청이 실패하면 [GroupFailure] 또는
-/// 네트워크 오류를 던진다.
+/// 그룹 설정: 그룹 상세(초대 코드·멤버)와 (owner면) 들어온 가입 신청.
+/// 요청이 실패하면 [GroupFailure] 또는 네트워크 오류를 던진다.
 @riverpod
-class GroupDetailViewModel extends _$GroupDetailViewModel {
+class GroupSettingsViewModel extends _$GroupSettingsViewModel {
   @override
   Future<({GroupDetail detail, List<JoinRequest> requests})> build(
     int groupId,
@@ -62,7 +62,7 @@ class GroupDetailViewModel extends _$GroupDetailViewModel {
     ref.invalidate(myGroupsProvider);
   }
 
-  // 멤버 목록과 모임 탭의 인원 수를 다시 불러온다.
+  // 멤버 목록과 모임 탭의 인원 수를 다시 불러온다 (그룹 홈은 돌아오면 다시 불러온다).
   void _membersChanged() {
     ref.invalidateSelf();
 

@@ -1,10 +1,9 @@
-import "package:go_router/go_router.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
-import "view_models/view_models.dart";
+import "hooks/hooks.dart";
 import "widgets/widgets.dart";
 
 // shortcut: menus with a null path are placeholders with no-op taps, give
@@ -26,12 +25,12 @@ const _sections = [
   ),
 ];
 
-class MyPage extends ConsumerWidget {
+class MyPage extends HookConsumerWidget {
   const MyPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(myViewModelProvider);
+    final page = useMyPage(ref);
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -41,12 +40,7 @@ class MyPage extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         // 불러오는 동안은 빈 카드.
-        MyProfileCard(
-          name:
-              profile.value?.name ?? (profile.hasError ? "정보를 불러오지 못했어요" : ""),
-          email: profile.value?.email ?? "",
-          onTap: () => context.go("/mypage/info"),
-        ),
+        MyProfileCard(name: page.name, email: page.email, onTap: page.openInfo),
 
         for (final s in _sections) ...[
           Padding(
@@ -72,9 +66,7 @@ class MyPage extends ConsumerWidget {
                   MyMenuTile(
                     icon: m.icon,
                     label: m.label,
-                    onTap: () {
-                      if (m.path case final path?) context.go(path);
-                    },
+                    onTap: () => page.openMenu(m.path),
                   ),
                 ],
               ],

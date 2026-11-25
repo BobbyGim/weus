@@ -76,6 +76,26 @@ abstract interface class GroupRepository {
 
   /// owner만. [userId]를 내보낸다.
   Future<void> removeMember(int groupId, String userId);
+
+  /// 그룹 홈 한 번에: 그룹 [header]와 게시글, 최근 글부터 [limit]개. 다음 페이지는
+  /// 마지막으로 받은 글의 id를 [beforeId]로 넘기고, 그때 [header]는 null.
+  /// 멤버가 아니면 [GroupFailure].
+  Future<({GroupHeader? header, List<GroupPostSummary> posts})> fetchGroupHome(
+    int groupId, {
+    int? beforeId,
+    required int limit,
+  });
+
+  /// 글 하나. 삭제됐거나 없으면 null.
+  Future<GroupPost?> fetchPost(int groupId, int postId);
+
+  /// 글을 올린다. 같은 [clientId]로 다시 부르면 새로 만들지 않는다 (두 번 탭, 재시도).
+  Future<void> createPost(
+    int groupId, {
+    required String title,
+    required String description,
+    required String clientId,
+  });
 }
 
 /// 그룹 요청 거절. [message]는 사용자에게 그대로 보여줄 문구다.

@@ -4,14 +4,14 @@ import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
-import "view_models/view_models.dart";
+import "hooks/hooks.dart";
 
-class MyInfoPage extends ConsumerWidget {
+class MyInfoPage extends HookConsumerWidget {
   const MyInfoPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(myInfoViewModelProvider);
+    final page = useMyInfoPage(ref);
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -34,8 +34,7 @@ class MyInfoPage extends ConsumerWidget {
               title: Text("닉네임", style: text.bodyLarge),
               // 불러오는 동안은 비워 둔다.
               trailing: Text(
-                profile.value?.nickname ??
-                    (profile.hasError ? "불러오지 못했어요" : ""),
+                page.nickname,
                 style: text.bodyLarge!.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
@@ -43,11 +42,7 @@ class MyInfoPage extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.xxl),
 
-          OutlinedButton(
-            onPressed: () =>
-                ref.read(myInfoViewModelProvider.notifier).signOut(),
-            child: const Text("로그아웃"),
-          ),
+          OutlinedButton(onPressed: page.signOut, child: const Text("로그아웃")),
         ],
       ),
     );

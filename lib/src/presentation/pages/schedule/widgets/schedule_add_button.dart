@@ -1,6 +1,7 @@
 import "package:flutter_svg/flutter_svg.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
+import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "schedule_add_sheet.dart";
 
@@ -20,15 +21,9 @@ class ScheduleAddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return FloatingActionButton(
-      // No Hero: the page and the sheet each show one at the same time.
-      heroTag: null,
+    return AppFab(
       tooltip: "일정 등록",
       onPressed: () => showScheduleAddSheet(context),
-      backgroundColor: scheme.primary,
-      foregroundColor: scheme.onPrimary,
-      elevation: 2,
-      shape: const CircleBorder(),
       child: Stack(
         alignment: Alignment.center,
         children: [

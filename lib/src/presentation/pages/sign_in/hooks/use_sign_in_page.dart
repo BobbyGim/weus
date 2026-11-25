@@ -5,19 +5,41 @@ import "package:cupertino_ui/cupertino_ui.dart"
         showCupertinoModalPopup;
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:go_router/go_router.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:weus/src/domain/domain.dart";
+import "package:weus/src/presentation/widgets/widgets.dart";
 
-/// 로그인 폼. 이메일과 비밀번호가 다 있으면 로그인할 수 있다.
+import "../view_models/view_models.dart";
+
+/// 로그인 폼. 이메일과 비밀번호가 다 있고 로그인 중이 아니면 [canSubmit].
+/// 로그인이 실패하면 스낵바로 알린다. [openSignUp]은 회원가입으로.
 /// dev·staging에서는 로고를 7번 연속(2초 이내 간격) 누르면 테스트 계정 목록이 떠서,
 /// 고른 계정의 이메일·비밀번호가 채워진다.
 ({
   TextEditingController email,
   TextEditingController password,
-  bool filled,
+  bool loading,
+  bool canSubmit,
+  VoidCallback submit,
+  VoidCallback notReady,
+  VoidCallback openSignUp,
   VoidCallback onLogoTap,
 })
-useSignInPage() {
+useSignInPage(WidgetRef ref) {
   final context = useContext();
+
+  final loading = ref.watch(signInViewModelProvider).isLoading;
+
+  ref.listen(signInViewModelProvider, (_, next) {
+    if (next case AsyncError(:final error)) {
+      showAppSnackBar(
+        context,
+        error is AuthFailure ? error.message : "잠시 후 다시 시도해 주세요",
+      );
+    }
+  });
 
   final email = useTextEditingController();
 
@@ -71,10 +93,19 @@ useSignInPage() {
     );
   }
 
+  final filled = email.text.trim().isNotEmpty && password.text.isNotEmpty;
+
   return (
     email: email,
     password: password,
-    filled: email.text.trim().isNotEmpty && password.text.isNotEmpty,
+    loading: loading,
+    canSubmit: filled && !loading,
+    submit: () => ref
+        .read(signInViewModelProvider.notifier)
+        .signIn(email: email.text.trim(), password: password.text),
+    // shortcut: 카카오·애플 로그인은 버튼만 있고 연결 전, 연결하면 각 ViewModel 호출로.
+    notReady: () => showAppSnackBar(context, "준비 중인 기능이에요"),
+    openSignUp: () => context.go("/signin/signup"),
     onLogoTap: onLogoTap,
   );
 }

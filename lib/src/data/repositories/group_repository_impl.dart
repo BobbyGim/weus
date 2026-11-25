@@ -24,6 +24,7 @@ class GroupRepositoryImpl implements GroupRepository {
     "cannot_remove_self": "자기 자신은 내보낼 수 없어요",
     "invalid_category": "없는 카테고리예요",
     "duplicate_category": "같은 카테고리를 두 번 고를 수 없어요",
+    "not_group_member": "그룹을 찾을 수 없어요",
   };
 
   Future<dynamic> _rpc(String fn, [Map<String, dynamic>? params]) =>
@@ -274,6 +275,100 @@ class GroupRepositoryImpl implements GroupRepository {
   @override
   Future<void> removeMember(int groupId, String userId) =>
       _rpc("remove_group_member", {"p_group_id": groupId, "p_user_id": userId});
+
+  // groups·profiles·댓글 수를 RPC 안에서 join해 요청 한 번으로.
+  @override
+  Future<({GroupHeader? header, List<GroupPostSummary> posts})> fetchGroupHome(
+    int groupId, {
+    int? beforeId,
+    required int limit,
+  }) async {
+    final data = await _rpc("group_home", {
+      "p_group_id": groupId,
+      "p_before_id": beforeId,
+      "p_limit": limit,
+    }) as Map<String, dynamic>;
+
+    final group = data["group"] as Map<String, dynamic>?;
+
+    return (
+      header: group == null
+          ? null
+          : (
+              name: group["name"] as String,
+              categories: (group["categories"] as List).cast<String>(),
+              memberCount: group["member_count"] as int,
+            ),
+      posts: [
+        for (final row in data["posts"] as List)
+          (
+            id: row["id"] as int,
+            title: row["title"] as String,
+            authorName: row["author_name"] as String? ?? "알 수 없음",
+            isMine: row["is_mine"] as bool? ?? false,
+            commentCount: row["comment_count"] as int,
+            createdAt: DateTime.parse(row["created_at"] as String),
+          ),
+      ],
+    );
+  }
+
+  @override
+  Future<GroupPost?> fetchPost(int groupId, int postId) async {
+    final posts = await _withAuthors(
+      groupId,
+      _supabase
+          .from("group_posts")
+          .select("id, author_id, title, description, created_at")
+          .eq("group_id", groupId)
+          .eq("id", postId),
+    );
+
+    return posts.firstOrNull;
+  }
+
+  // 글 행에 작성자 이름을 붙인다. 이름은 group_member_profiles (나간 멤버도 들어 있다)에서.
+  Future<List<GroupPost>> _withAuthors(
+    int groupId,
+    Future<List<Map<String, dynamic>>> query,
+  ) async {
+    final (rows, people) = await (
+      query,
+      _rpc("group_member_profiles", {"p_group_id": groupId}),
+    ).wait;
+
+    final names = {
+      for (final p in people as List)
+        p["user_id"] as String: p["name"] as String,
+    };
+
+    final me = _supabase.auth.currentUser!.id;
+
+    return [
+      for (final row in rows)
+        (
+          id: row["id"] as int,
+          authorName: names[row["author_id"]] ?? "알 수 없음",
+          isMine: row["author_id"] == me,
+          title: row["title"] as String,
+          description: row["description"] as String,
+          createdAt: DateTime.parse(row["created_at"] as String),
+        ),
+    ];
+  }
+
+  @override
+  Future<void> createPost(
+    int groupId, {
+    required String title,
+    required String description,
+    required String clientId,
+  }) => _rpc("create_post", {
+    "p_group_id": groupId,
+    "p_title": title,
+    "p_description": description,
+    "p_client_id": clientId,
+  });
 }
 
 @Riverpod(keepAlive: true)

@@ -42,21 +42,29 @@ class ScheduleTile extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  width: 4,
-                  decoration: BoxDecoration(
-                    color: isShared ? scheme.tertiary : scheme.primary,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
-                  ),
-                ),
-
-                const SizedBox(width: AppSpacing.md),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: text.titleMedium),
+                      // 제목 앞 점: 공동일정은 민트, 내 일정은 파랑.
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: isShared
+                                  ? scheme.tertiary
+                                  : scheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+
+                          const SizedBox(width: AppSpacing.sm),
+
+                          Expanded(child: Text(title, style: text.titleMedium)),
+                        ],
+                      ),
 
                       const SizedBox(height: AppSpacing.xs),
 

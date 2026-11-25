@@ -133,7 +133,48 @@ GoRouter router(Ref ref) {
                       ),
                     ),
                     routes: [
-                      // 모임 수정 (모임장만, 상세의 메뉴에서). 일정 등록처럼 바텀시트.
+                      // 그룹 설정 (그룹 홈의 ⚙에서): 초대 코드·멤버·나가기, owner는 관리.
+                      GoRoute(
+                        path: "settings",
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (_, state) => CupertinoPage(
+                          key: state.pageKey,
+                          child: GroupSettingsPage(
+                            groupId:
+                                int.tryParse(state.pathParameters["id"]!) ?? 0,
+                          ),
+                        ),
+                      ),
+
+                      GoRoute(
+                        path: "post/new",
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (_, state) => CupertinoPage(
+                          key: state.pageKey,
+                          child: GroupPostNewPage(
+                            groupId:
+                                int.tryParse(state.pathParameters["id"]!) ?? 0,
+                          ),
+                        ),
+                      ),
+
+                      // post/new 뒤에 둬야 new가 글 id로 잡히지 않는다.
+                      GoRoute(
+                        path: "post/:postId",
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (_, state) => CupertinoPage(
+                          key: state.pageKey,
+                          child: GroupPostPage(
+                            groupId:
+                                int.tryParse(state.pathParameters["id"]!) ?? 0,
+                            postId:
+                                int.tryParse(state.pathParameters["postId"]!) ??
+                                0,
+                          ),
+                        ),
+                      ),
+
+                      // 모임 수정 (모임장만, 그룹 설정에서). 일정 등록처럼 바텀시트.
                       GoRoute(
                         path: "edit",
                         parentNavigatorKey: rootKey,

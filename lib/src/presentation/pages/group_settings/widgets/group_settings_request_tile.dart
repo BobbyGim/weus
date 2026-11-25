@@ -3,8 +3,8 @@ import "package:weus/src/domain/domain.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 
 /// owner에게 보이는 가입 신청 한 줄과 거절·수락 버튼.
-class GroupDetailRequestTile extends StatelessWidget {
-  const GroupDetailRequestTile({
+class GroupSettingsRequestTile extends StatelessWidget {
+  const GroupSettingsRequestTile({
     super.key,
     required this.request,
     required this.onApprove,

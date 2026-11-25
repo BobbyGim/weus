@@ -2,7 +2,6 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
-import "package:weus/src/data/data.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/utils/utils.dart";
 
@@ -14,12 +13,9 @@ class SchedulePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final schedules = ref.watch(schedulesProvider);
+    final schedule = useSchedulePage(ref);
 
-    // 로딩이 끝나지 않으면 아래에서 달력 대신 로딩을 보여준다 (훅은 항상 먼저 부른다).
-    final schedule = useSchedulePage(schedules.value ?? const []);
-
-    if (!schedules.hasValue && !schedules.hasError) {
+    if (schedule.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
