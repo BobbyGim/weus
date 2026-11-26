@@ -9,7 +9,7 @@ import "widgets/widgets.dart";
 
 /// 승인 대기 중인 내 신청과 내가 속한 모임 (둘 다 없으면 안내).
 /// 내 모임은 20개씩, 끝에 가까워지면 다음 20개. + 버튼으로 모임 만들기,
-/// "모임 찾기"·"코드로 참여"로 가입 신청.
+/// "내 그룹" 옆 아이콘(돋보기·티켓)으로 그룹 찾기·코드로 참여.
 class GroupPage extends HookConsumerWidget {
   const GroupPage({super.key});
 
@@ -88,16 +88,16 @@ class GroupPage extends HookConsumerWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextButton.icon(
+                    IconButton(
                       onPressed: page.openExplore,
-                      icon: const Icon(LucideIcons.search, size: 18),
-                      label: const Text("그룹 찾기"),
+                      tooltip: "그룹 찾기",
+                      icon: const Icon(LucideIcons.search, size: 22),
                     ),
 
-                    TextButton.icon(
+                    IconButton(
                       onPressed: page.openJoin,
-                      icon: const Icon(LucideIcons.ticket, size: 18),
-                      label: const Text("코드로 참여"),
+                      tooltip: "코드로 참여",
+                      icon: const Icon(LucideIcons.ticket, size: 22),
                     ),
                   ],
                 ),
