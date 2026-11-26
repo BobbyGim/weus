@@ -62,3 +62,6 @@ app.*.map.json
 
 # Supabase (local only)
 /supabase/
+
+# 로컬 개발 도구
+tool/hot_reload_watch.py

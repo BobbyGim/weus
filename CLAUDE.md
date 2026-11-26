@@ -62,6 +62,7 @@ Remote is `https://BobbyGim@github.com/BobbyGim/weus.git` — the username in th
 - 테스트 코드(`test/`, 위젯/유닛/골든 테스트 등)는 작성하지 않는다. 검증은 `flutter analyze`와 빌드/실행으로 한다. (ponytail의 "runnable check" 규칙보다 우선)
 - 코드 주석(`//`, `///`)의 설명은 한글로 쓴다.
 - 페이지·위젯의 `build`에는 UI(위젯 배치, 분기, 스타일)만 둔다. 로직(provider watch/listen, 파생 값, 콜백, 내비게이션, 컨트롤러, 로컬 상태)은 페이지/위젯 옆 `hooks/`의 `use<Name>()` 훅으로 옮기고, `ref`가 필요하면 `use<Name>(ref, …)`로 넘긴다 (예: `useGroupDetailPage(ref, groupId)`). 콜백 하나뿐인 아주 작은 위젯은 예외.
+- 파일 하나에 위젯 클래스 하나만 둔다 (private `_Foo` 포함). 메뉴와 그 아이템처럼 함께 쓰는 위젯도 파일을 나눈다 (`home_quick_menu.dart` + `home_quick_menu_item.dart`), 파일 이름은 위젯 이름의 snake_case.
 
 <!-- 프로젝트 규칙을 여기에 추가하세요. 예:
 - 응답은 한국어로
