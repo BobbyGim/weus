@@ -324,8 +324,8 @@ class _GroupHeroScaffoldState extends State<GroupHeroScaffold> {
   }
 }
 
-/// 모임 화면 맨 아래를 가로 끝까지, 홈 인디케이터 영역까지 채우는 버튼 (예: 가입 신청).
-/// [onPressed]가 null이면 회색으로 꺼진다. [secondary]면 회색 배경의 보조 버튼 (예: 신청 취소).
+/// 모임 화면 맨 아래, 양옆을 띄운 일반 버튼 (예: 가입 신청).
+/// [onPressed]가 null이면 꺼진다. [secondary]면 회색 배경의 보조 버튼 (예: 신청 취소).
 class GroupHeroBottomButton extends StatelessWidget {
   const GroupHeroBottomButton({
     super.key,
@@ -344,31 +344,25 @@ class GroupHeroBottomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    final enabled = onPressed != null;
-
-    return Material(
-      color: enabled && !secondary ? scheme.primary : AppColors.gray200,
-      child: InkWell(
-        onTap: onPressed,
-        child: SafeArea(
-          top: false,
-          // 홈 인디케이터 여백(SafeArea) 위로 52: 카카오 참여하기 버튼과 같은 비율.
-          child: SizedBox(
-            height: 52,
-            child: Center(
-              child: Text(
-                label,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: !enabled
-                      ? AppColors.gray400
-                      : secondary
-                      ? AppColors.ink
-                      : scheme.onPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+    return ColoredBox(
+      color: scheme.surfaceContainerLowest,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.sm,
+          AppSpacing.xl,
+          AppSpacing.lg,
+        ),
+        child: FilledButton(
+          onPressed: onPressed,
+          style: secondary
+              ? FilledButton.styleFrom(
+                  backgroundColor: AppColors.gray200,
+                  foregroundColor: AppColors.ink,
+                )
+              : null,
+          child: Text(label),
         ),
       ),
     );
