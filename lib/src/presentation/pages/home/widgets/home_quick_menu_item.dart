@@ -46,7 +46,7 @@ class HomeQuickMenuItem extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.bodySmall!.copyWith(
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: scheme.onSurface,
               ),
             ),

@@ -1,4 +1,5 @@
 import "package:flutter_hooks/flutter_hooks.dart";
+import "package:go_router/go_router.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:table_calendar/table_calendar.dart";
@@ -129,7 +130,7 @@ List<ScheduleLabel?> _labelsOn(
 }
 
 /// Calendar starts on, and selects, today's KST date. 일정을 아직 못 불러왔으면
-/// [loading] (실패하면 빈 달력).
+/// [loading] (실패하면 빈 달력). [add]면 일정 등록 시트를 바로 띄운다.
 ({
   bool loading,
   DateTime today,
@@ -139,7 +140,7 @@ List<ScheduleLabel?> _labelsOn(
   OnDaySelected onDaySelected,
   void Function(DateTime day) onPageChanged,
 })
-useSchedulePage(WidgetRef ref) {
+useSchedulePage(WidgetRef ref, {bool add = false}) {
   final data = ref.watch(schedulesProvider);
 
   final schedules = data.value ?? const <Schedule>[];
@@ -153,6 +154,21 @@ useSchedulePage(WidgetRef ref) {
   final focusedDay = useState(today);
 
   final context = useContext();
+
+  useEffect(() {
+    if (!add) return null;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+
+      // 주소에서 add를 지워 탭을 다시 눌러도 시트가 또 열리지 않게 한다.
+      context.go("/schedule");
+
+      showScheduleAddSheet(context);
+    });
+
+    return null;
+  }, [add]);
 
   void openSheet(DateTime day) => showModalBottomSheet<void>(
     context: context,

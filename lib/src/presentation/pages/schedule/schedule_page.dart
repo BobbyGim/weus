@@ -9,11 +9,14 @@ import "hooks/hooks.dart";
 import "widgets/widgets.dart";
 
 class SchedulePage extends HookConsumerWidget {
-  const SchedulePage({super.key});
+  const SchedulePage({super.key, this.add = false});
+
+  /// true면 열자마자 일정 등록 시트를 띄운다 (`/schedule?add=1`, 홈 바로가기·딥링크).
+  final bool add;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final schedule = useSchedulePage(ref);
+    final schedule = useSchedulePage(ref, add: add);
 
     if (schedule.loading) {
       return const Center(child: CircularProgressIndicator());

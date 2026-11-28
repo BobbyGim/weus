@@ -63,7 +63,8 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: "/schedule",
-                builder: (_, _) => const SchedulePage(),
+                builder: (_, state) =>
+                    SchedulePage(add: state.uri.queryParameters["add"] == "1"),
               ),
             ],
           ),
