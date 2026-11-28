@@ -65,6 +65,7 @@ dependencies:
   material_ui: ^1.11.0
   cupertino_ui: ^1.1.6
   supabase_flutter: ^2.18.3
+  url_launcher: ^6.3.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

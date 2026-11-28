@@ -1,23 +1,39 @@
+import "package:cached_network_image/cached_network_image.dart";
 import "package:carousel_slider/carousel_slider.dart";
-import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 
 import "hooks/hooks.dart";
 
-// ponytail: static asset banners; move to a repository + ViewModel once banners come from the API.
-const _banners = [
-  "assets/image/banner/banner_1.png",
-  "assets/image/banner/banner_2.png",
-  "assets/image/banner/banner_3.png",
-];
-
-/// Auto-playing 2:1 home banner with a "1 / 3" counter over the image.
-class HomeBannerCarousel extends HookWidget {
+/// DB(banners)에서 불러온 2:1 홈 배너. 자동으로 넘어가고 이미지 위에 "1 / 3"이 보인다.
+/// 누르면 배너의 링크로 이동한다. 배너가 없거나 못 불러오면 자리를 차지하지 않는다.
+class HomeBannerCarousel extends HookConsumerWidget {
   const HomeBannerCarousel({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final banner = useHomeBannerCarousel();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final banner = useHomeBannerCarousel(ref);
+
+    final banners = banner.banners;
+
+    final placeholder = ColoredBox(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+    );
+
+    if (banners == null) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: banner.sidePadding),
+        child: AspectRatio(
+          aspectRatio: banner.imageAspectRatio,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: placeholder,
+          ),
+        ),
+      );
+    }
+
+    if (banners.isEmpty) return const SizedBox.shrink();
 
     return Stack(
       children: [
@@ -25,12 +41,21 @@ class HomeBannerCarousel extends HookWidget {
           carouselController: banner.controller,
           options: banner.options,
           items: [
-            for (final src in _banners)
+            for (final b in banners)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: banner.sidePadding),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(src, fit: BoxFit.cover, width: .infinity),
+                child: GestureDetector(
+                  onTap: () => banner.onTap(b),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: b.imageUrl,
+                      fit: BoxFit.cover,
+                      width: .infinity,
+                      placeholder: (_, _) => placeholder,
+                      errorWidget: (_, _, _) => placeholder,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -51,7 +76,7 @@ class HomeBannerCarousel extends HookWidget {
                 style: const TextStyle(fontWeight: FontWeight.w700),
                 children: [
                   TextSpan(
-                    text: " / ${_banners.length}",
+                    text: " / ${banners.length}",
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withValues(alpha: 0.7),
