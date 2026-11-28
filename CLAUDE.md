@@ -4,19 +4,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`weus` — Flutter app (Android/iOS only), Flutter 3.50, Dart SDK ^3.14.0. Early stage: `lib/main.dart` (bootstrap, `MyApp`), `lib/src/` (router, domain, data, presentation), and `main_<flavor>.dart` entry files.
+`weus` — Flutter app (Android/iOS only), Flutter 3.50, Dart SDK ^3.14.0. `lib/main.dart` (bootstrap, `MyApp`), `lib/src/` (router, domain, data, presentation), and `main_<flavor>.dart` entry files.
 
-- Routing: `go_router`, exposed as `routerProvider` (`@Riverpod(keepAlive: true)`) in `lib/src/router/app_router.dart` (`router.dart` is the folder barrel); `MyApp` is a `ConsumerWidget` that watches it. Tabs (`/`, `/schedule`, `/group`, `/mypage`) are the branches of a `StatefulShellRoute.indexedStack` (`AppShell`, header + bottom nav), so each tab keeps its state; full-screen pages are child routes of their tab (`/mypage/info` under `/mypage`) with `parentNavigatorKey: rootKey` (covers the header/nav) and `pageBuilder` → `CupertinoPage` (slide + iOS swipe back), each written out, no helper, and are opened with `context.go`, so a deep link stacks them on their tab too (while the app is not on screen yet — cold start or returning from the background — `deepLinkRedirect` in `lib/src/router/deep_link_redirect.dart` opens the tab first, then slides the page in once the app is visible; `onScreen()` in `app_visibility.dart`). Add routes in `app_router.dart`; other redirect logic (e.g. auth) goes in its own file in `lib/src/router/`. `/` is the home page; no Flutter splash route.
-- Hooks: `flutter_hooks` + `hooks_riverpod`. Import `package:hooks_riverpod/hooks_riverpod.dart` (re-exports flutter_riverpod; `flutter_riverpod` is not a direct dependency). Widgets needing `ref` + local state (controllers, animations, focus nodes) → `HookConsumerWidget` with `useTextEditingController()` etc. instead of `ConsumerStatefulWidget`; `ref` only → `ConsumerWidget`; neither → `StatelessWidget`. Shared state stays in providers, not hooks.
-- State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. Generated files (`*.g.dart`, `*.freezed.dart`, `*.config.dart`, `*.gen.dart`) are gitignored — after a fresh clone or pull, run `dart run build_runner build -d` before building. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
-- Models: `freezed` + `json_serializable`.
-- Local DB: drift (`lib/src/data/database/`). `build.yaml` sets `store_date_time_values_as_text`, so `DateTime` columns are ISO-8601 TEXT (`DateTime.now()` → `2026-11-16T23:07:35.706 +09:00`). Schedule start/end store the picked day + the time of saving (same format as `created_at`); the repository turns them back into UTC-midnight dates for the app. Schema change → bump `schemaVersion` + add the step in `onUpgrade`.
-- After changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, regenerate: `dart run build_runner build -d` (or `watch -d`).
-- Icons: Lucide only (`lucide_icons_flutter`, `import "package:lucide_icons_flutter/lucide_icons.dart";` → `Icon(LucideIcons.calendarDays)`). Never Material `Icons.*` / `CupertinoIcons.*`, and no Material icon widgets (`CloseButton`, `BackButton` → `IconButton` with a Lucide icon). Lucide has no filled variants: show selected/active state with color, not a second icon.
-- Font: Pretendard (400/500/600/700/800/900, `assets/fonts/`, OFL license alongside) is the theme default via `ThemeData(fontFamily: 'Pretendard')`. Other weights fall back to synthesized ones. Every `TextTheme` style sets `FontFeature.tabularFigures()` (all digits same width, app-wide) — keep it when adding styles.
+- State: Riverpod 3 with codegen (`@riverpod` + `riverpod_generator`); `bootstrap()` wraps the app in `ProviderScope`. `riverpod_lint` is enabled as an analyzer plugin in `analysis_options.yaml`.
+- Models: `freezed` + `json_serializable`. Routing: `go_router`. Hooks: `flutter_hooks` + `hooks_riverpod`. Local DB: drift.
+- Generated files (`*.g.dart`, `*.freezed.dart`, `*.config.dart`, `*.gen.dart`) are gitignored — after a fresh clone or pull, and after changing any `@riverpod` / `@freezed` / `@JsonSerializable` code, run `dart run build_runner build -d` (or `watch -d`).
 - Lints: `flutter_lints` via `analysis_options.yaml`; `android/` and `ios/` are excluded from analysis.
 
-## Flavors (dev / staging / prod)
+## Where the rest lives
+
+상황별 규칙은 해당 파일을 만질 때만 읽히도록 나눠 두었다. README.md에는 설치·실행·빌드와 이 표의 링크만 있다. 규칙을 바꿀 때는 이 파일들만 고친다.
+
+| 파일 | 언제 읽히나 | 내용 |
+|---|---|---|
+| `.claude/rules/architecture.md` | `lib/**` | 레이어, 폴더 구조, 코드 위치, barrel, 코드 스타일 |
+| `.claude/rules/presentation.md` | `lib/src/presentation/**` | build엔 UI만, 위젯 1파일, 위젯 종류, 아이콘, 폰트, MVVM, 훅 |
+| `.claude/rules/forms.md` | `lib/src/presentation/**` | 키보드 처리 두 방식 |
+| `.claude/rules/router.md` | `lib/src/router/**` | 탭·전체 화면·시트 라우트, 딥링크, 딥링크 테스트 |
+| `.claude/rules/database.md` | `lib/src/data/**` | drift, 날짜 저장 형식, 스키마 변경 |
+| `.claude/rules/flavors.md` | `android/`, `ios/`, `lib/main*.dart`, `pubspec.yaml`, `.env*` | flavor, 아이콘·스플래시, 네이티브 설정 |
+| `.claude/skills/new-page/` | 새 페이지 추가 시 | 페이지·훅·VM·barrel·라우트 절차 |
+| `.claude/agents/reviewer.md` | 리뷰를 맡길 때 | 규칙 기준 diff 검토 |
+
+## Flavors
 
 | flavor | bundle / applicationId | app name | deep link |
 |---|---|---|---|
@@ -24,19 +34,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | staging | `com.weus.weus.staging` | 위어스 stg | `weus-staging://app/<route>` |
 | prod | `com.weus.weus` | 위어스 | `weus://app/<route>` |
 
-- `flutter run --flavor staging -t lib/main_staging.dart` (entry files `main_<flavor>.dart` call `bootstrap('<flavor>')` in `main.dart`). Keep `--flavor` and `-t` matching. Plain `flutter run` → `dev` (`default-flavor` in pubspec, env from `appFlavor`).
-- App-wide startup code goes in `bootstrap()` in `lib/main.dart`, not in the per-flavor entry files.
-- Android: `productFlavors` in `android/app/build.gradle.kts`, label via `resValue("string","app_name")`.
-- iOS: build configs `Debug-<flavor>` / `Release-<flavor>` / `Profile-<flavor>` + schemes `dev`/`staging`/`prod`. Bundle id and `APP_DISPLAY_NAME` (→ `CFBundleDisplayName`) are set per config in `project.pbxproj`. Adding a flavor means adding all three configs + a scheme.
-- Env: `main.dart` loads `.env.$appFlavor` via `flutter_dotenv`. `.env.*` files are gitignored but declared as assets, so **a fresh clone must create `.env.dev`, `.env.staging`, `.env.prod` from `.env.example` before building**. Everything in them ships inside the app bundle — no real secrets.
-- Icons & splash per flavor: prod = light (white bg, dark logo), dev/staging = inverted (dark `#111111` bg, white logo). Sources in `assets/logo/`; configs `flutter_launcher_icons-<flavor>.yaml` / `flutter_native_splash-<flavor>.yaml`. Regenerate with `dart run flutter_launcher_icons` and `dart run flutter_native_splash:create --flavors dev,staging,prod`. iOS configs point at `AppIcon-<flavor>` and `LAUNCH_SCREEN_STORYBOARD=LaunchScreen<Flavor>` (Info.plist uses `$(LAUNCH_SCREEN_STORYBOARD)`); re-running the splash generator does not touch these.
-- Splash is native only (no Flutter splash page): logo `splash_<light|dark>.png` (@4x, 180pt) + bottom wordmark `branding_<light|dark>.png` ("WeUs"); Android 12 uses `splash_a12_*.png` (1152px, logo kept inside the icon circle). If startup work is added (e.g. auth check), keep the native splash up with `FlutterNativeSplash.preserve()` / `remove()` instead of adding a splash route, so deep links land directly on their page.
-- Deep links (custom scheme): host is always `app`, the path is the go_router route (`weus://app/schedule`). iOS: `APP_URL_SCHEME` per build config in `project.pbxproj` → `CFBundleURLTypes` in Info.plist. Android: `manifestPlaceholders["appScheme"]` per flavor → VIEW intent-filter in AndroidManifest. Test: `xcrun simctl openurl booted "<url>"` / `adb shell am start -a android.intent.action.VIEW -d "<url>"`.
-- Android `compileSdk = 37` (required by `permission_handler`); `android.suppressUnsupportedCompileSdk=37` silences the AGP warning.
-
-## Architecture
-
-See @README.md (architecture, naming, hooks, MVVM, barrels, code style).
+`flutter run --flavor staging -t lib/main_staging.dart` — keep `--flavor` and `-t` matching. Plain `flutter run` → `dev`.
 
 ## Commands
 
@@ -61,11 +59,3 @@ Remote is `https://BobbyGim@github.com/BobbyGim/weus.git` — the username in th
 - 코드를 작성/수정/리팩터링할 때는 `ponytail:ponytail` 스킬을 적용한다.
 - 테스트 코드(`test/`, 위젯/유닛/골든 테스트 등)는 작성하지 않는다. 검증은 `flutter analyze`와 빌드/실행으로 한다. (ponytail의 "runnable check" 규칙보다 우선)
 - 코드 주석(`//`, `///`)의 설명은 한글로 쓴다.
-- 페이지·위젯의 `build`에는 UI(위젯 배치, 분기, 스타일)만 둔다. 로직(provider watch/listen, 파생 값, 콜백, 내비게이션, 컨트롤러, 로컬 상태)은 페이지/위젯 옆 `hooks/`의 `use<Name>()` 훅으로 옮기고, `ref`가 필요하면 `use<Name>(ref, …)`로 넘긴다 (예: `useGroupDetailPage(ref, groupId)`). 콜백 하나뿐인 아주 작은 위젯은 예외.
-- 파일 하나에 위젯 클래스 하나만 둔다 (private `_Foo` 포함). 메뉴와 그 아이템처럼 함께 쓰는 위젯도 파일을 나눈다 (`home_quick_menu.dart` + `home_quick_menu_item.dart`), 파일 이름은 위젯 이름의 snake_case.
-
-<!-- 프로젝트 규칙을 여기에 추가하세요. 예:
-- 응답은 한국어로
-- 상태관리는 Riverpod 사용
-- 화면 파일은 lib/screens/ 에 둔다
--->

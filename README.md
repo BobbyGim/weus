@@ -49,89 +49,7 @@ flutter build ipa --flavor prod -t lib/main_prod.dart
 
 ---
 
-## Navigation & Deep Links
-
-라우트는 `lib/src/router/app_router.dart`에 모여 있습니다. 화면은 두 종류입니다.
-
-| 종류 | 예 | 여는 방법 | 닫으면 |
-|---|---|---|---|
-| 탭 | `/`, `/schedule`, `/group`, `/mypage` | 하단 탭 | - (탭마다 상태 유지, 탭을 누르면 맨 위로 스크롤) |
-| 탭 위 전체 화면 | `/mypage/info`, `/group/new`, `/group/join`, `/group/explore`, `/group/explore/:id`, `/group/:id`, `/group/:id/settings`, `/group/:id/post/new`, `/group/:id/post/:postId` | `context.go` (자기 탭 아래 라우트) | 그 탭으로 |
-
-- 전체 화면은 자기 탭의 하위 라우트라 `context.go`로 열면 그 탭 위에 쌓입니다. 다른 탭에서 열 때는 `context.push`로 지금 화면 위에 쌓습니다 (홈의 "모임 찾기"는 홈 위에 열리고 닫으면 홈, 같은 주소를 딥링크로 열면 모임 탭 위).
-- 모임 미리보기(`/group/explore/:id`)와 그룹 상세(`/group/:id`)는 아래에서 올라오는 iOS 시트입니다 (아래로 끌면 닫힘).
-- 모임 찾기 검색어는 주소 쿼리로 남습니다 (`/group/explore?q=러닝`). 검색할 때는 `replace`라 뒤로가기에 검색 기록이 쌓이지 않습니다.
-
-### 딥링크로 열 때
-
-주소는 `<scheme>://app/<route>` 입니다 (scheme은 위 flavor 표).
-
-- 앱이 켜져 있으면 그 주소로 이동합니다 (전체 화면은 자기 탭 위에 쌓임).
-- 앱이 화면에 없을 때(콜드 스타트, 백그라운드에서 복귀)는 `deepLinkRedirect`가 그 탭을 먼저 띄우고, 앱이 보이면 페이지가 슬라이드로 들어옵니다 (`lib/src/router/deep_link_redirect.dart`).
-- 로그인 전에 들어온 딥링크는 로그인 화면으로 갑니다.
-- 그룹 상세 링크를 멤버가 아닌 사람이 열면 미리보기로 바뀝니다 (공개 모임이면 가입 신청, 아니면 없는 모임).
-
-### 딥링크 테스트
-
-```bash
-# 시뮬레이터 (simctl은 시뮬레이터에서만 동작)
-xcrun simctl openurl booted "weus-staging://app/group/explore"
-
-# 실기기 (Mac에 연결된 iPhone, 기기 ID는 `xcrun xctrace list devices`)
-xcrun devicectl device process launch --device <기기 ID> \
-  --payload-url "weus-staging://app/group/explore" com.weus.weus.staging
-
-# Android
-adb shell am start -a android.intent.action.VIEW -d "weus-staging://app/group/explore"
-```
-
-- 한글 검색어는 인코딩해서 넣으세요 (`?q=%EC%9A%94%EA%B0%80` = 요가).
-- 실기기에서는 Safari 주소창에 주소를 입력해도 열립니다.
-
----
-
-## Forms & Keyboard
-
-입력 화면은 키보드를 다루는 방식이 두 가지입니다. 화면에 맞게 고르세요.
-
-| 방식 | 쓰는 화면 | 키보드가 올라오면 |
-|---|---|---|
-| **화면 고정** (네이버 로그인처럼) | 로그인 (`sign_in_page.dart`) | 화면은 그대로, 키보드가 아래쪽을 덮음 |
-| **버튼이 키보드 위로** | 회원가입, 그룹 만들기·수정, 코드로 참여 | 화면이 줄어들고 맨 아래 버튼이 키보드 바로 위로 올라옴 (가려지면 스크롤) |
-
-### 화면 고정 (로그인)
-
-```
-┌──────────────┐
-│ 로고          │ ┐ 위 묶음: 아래 묶음을 뺀 나머지 높이 전부
-│ 이메일        │ │ 로고는 남는 높이 가운데, 모자라면 줄어듦
-│ 비밀번호      │ │
-│ 로그인 버튼   │ ┘
-│              │
-│ 소셜 로그인   │ ┐ 아래 묶음: 항상 맨 아래 (키보드가 덮어도 되는 것만)
-│ 회원가입      │ ┘
-└──────────────┘
-```
-
-- `Scaffold(resizeToAvoidBottomInset: false)`: 키보드가 올라와도 화면을 줄이지 않습니다.
-- 스크롤 뷰 없이 `Column`으로 위·아래 묶음을 나눕니다. 위 묶음은 `Expanded` 안의 `Column`이고, 그 안의 로고를 `Expanded` + `FittedBox(fit: BoxFit.scaleDown)`로 감싸 로고가 남는 높이의 가운데에 원래 크기로 놓이고, 공간이 모자라면 로고만 줄어듭니다. 그래서 어떤 화면에서도 오버플로가 나지 않습니다.
-- 키보드에 가리면 안 되는 것(입력칸, 주 버튼)은 위 묶음에, 가려져도 되는 것(소셜 로그인, 링크)은 아래 묶음에 둡니다.
-- 아주 작은 화면(iPhone SE 1세대)에서는 주 버튼이 키보드에 걸칠 수 있습니다. 마지막 입력칸에 `textInputAction: done` + `onSubmitted`를 달아 키보드의 완료로도 제출되게 합니다.
-
-### 버튼이 키보드 위로 (그 밖의 입력 화면)
-
-- `CustomScrollView` + `SliverFillRemaining(hasScrollBody: false)` 안에 `Column`, 입력칸 뒤에 `Spacer`와 버튼을 둡니다.
-- 화면에 다 들어가면 스크롤되지 않고(`ClampingScrollPhysics`), 키보드에 가려질 때만 스크롤됩니다.
-- 그룹 만들기는 버튼이 항상 보이도록 `Column` 안에 `Expanded(ListView)`(입력칸)와 버튼을 두어, 입력칸만 스크롤되고 버튼은 맨 아래에 고정됩니다.
-
-### 공통
-
-- **입력칸 밖을 누르면 키보드가 내려갑니다.** `main.dart`의 `MaterialApp.router` builder에서 앱 전체에 한 번 처리합니다 (Flutter는 모바일에서 기본으로 안 해 줌). 버튼·입력칸을 누르면 그쪽이 탭을 가져가서 영향이 없습니다.
-- 바텀시트 안의 폼(그룹 수정, 일정 등록)은 `MediaQuery.viewInsetsOf(context).bottom`만큼 아래를 띄워 버튼을 키보드 위에 둡니다.
-
----
-
-## Architecture Overview
+## Architecture
 
 레이어 우선(layer-first) 클린 아키텍처에 MVVM을 얹은 구조입니다.
 
@@ -140,188 +58,49 @@ presentation  ──▶  domain  ◀──  data
  (화면, VM)       (인터페이스)    (DB, API, 구현체)
 ```
 
-- **domain**: Repository 인터페이스. 순수 Dart이고, 다른 레이어를 import하지 않습니다.
-- **data**: DB, 네트워크 같은 데이터 소스와 repository 구현체입니다.
-- **presentation**: 페이지, ViewModel, 위젯, 훅입니다. Repository는 domain 인터페이스로만 다룹니다.
-- domain과 data는 **앱 전체가 함께 씁니다.** 기능별 `features/` 폴더는 없습니다.
-
-## Folder Structure
+| 레이어 | 위치 | 하는 일 |
+|---|---|---|
+| **domain** | `lib/src/domain/` | entity와 repository 인터페이스. 순수 Dart, 다른 레이어를 import하지 않음 |
+| **data** | `lib/src/data/` | DB(drift), 네트워크 같은 데이터 소스와 repository 구현체 |
+| **presentation** | `lib/src/presentation/` | 페이지, ViewModel, 위젯, 훅. repository는 domain 인터페이스로만 다룸 |
 
 ```
 lib/
-├── main.dart                 # bootstrap() — 앱 시작 코드는 여기에
-├── main_<flavor>.dart        # flavor별 진입점
+├── main.dart, main_<flavor>.dart
 └── src/
-    ├── router/
-    │   ├── router.dart             # barrel
-    │   ├── app_router.dart         # 라우트 표 (routerProvider)
-    │   ├── auth_redirect.dart      # 로그인 여부 redirect
-    │   ├── bottom_sheet_page.dart  # 아래에서 내용만큼 올라오는 바텀시트 페이지
-    │   ├── deep_link_redirect.dart # 딥링크 redirect
-    │   ├── sheet_page.dart         # 아래에서 올라오는 iOS 시트 페이지
-    │   └── app_visibility.dart     # 앱이 화면에 보일 때까지 대기 (onScreen)
-    ├── utils/                # 어느 레이어에서나 쓰는 순수 Dart 헬퍼
-    ├── domain/
-    │   ├── entities/
-    │   └── repositories/     # <name>_repository.dart (인터페이스)
-    ├── data/
-    │   ├── database/         # drift DB + provider, tables/ 에 테이블당 파일 하나
-    │   ├── network/          # dio + provider (필요할 때 추가)
-    │   ├── supabase/         # supabase + provider (필요할 때 추가)
-    │   └── repositories/     # <name>_repository_impl.dart
+    ├── router/          # 라우트 표, redirect
+    ├── utils/           # 순수 Dart 헬퍼
+    ├── domain/          # entities/, repositories/ (인터페이스)
+    ├── data/            # database/, repositories/ (구현체)
     └── presentation/
-        ├── theme/
-        ├── widgets/          # 2개 이상 페이지가 쓰는 위젯
-        ├── hooks/            # 2개 이상 페이지가 쓰는 훅
-        └── pages/
-            └── <page>/
-                ├── <page>_page.dart
-                ├── view_models/
-                ├── hooks/
-                └── widgets/
-                    └── hooks/
+        ├── theme/, widgets/, hooks/     # 공용
+        └── pages/<page>/
+            ├── <page>_page.dart         # View: UI만
+            ├── view_models/             # ViewModel: 상태, repository 호출
+            ├── hooks/                   # 로직: use<Page>Page()
+            └── widgets/                 # 이 페이지 전용 위젯
 ```
 
-### Where Does It Go?
+- 화면 하나에 ViewModel 하나 (`LoginPage` ↔ `LoginViewModel`), DI는 Riverpod provider.
+- 페이지·위젯의 `build`에는 UI만 두고, 로직은 옆 `hooks/`의 훅으로 옮깁니다.
+- 폴더마다 같은 이름의 barrel 파일이 있고, 밖에서는 barrel로 import합니다.
+- 기능별 `features/` 폴더는 없습니다. domain과 data는 앱 전체가 함께 씁니다.
 
-| 이런 코드는 | 여기에 |
+자세한 규칙은 아래 문서에 있습니다.
+
+## 개발 규칙
+
+규칙은 Claude Code와 사람이 같이 보도록 `.claude/`에 나눠 두었습니다. 같은 내용을 여기에 다시 쓰지 않습니다.
+
+| 문서 | 내용 |
 |---|---|
-| 날짜·텍스트 포맷 같은 순수 Dart 헬퍼 | `utils/` (`intl` OK, Flutter·`BuildContext` 금지) |
-| `BuildContext`나 위젯이 필요한 헬퍼 | `presentation/` |
-| repository 인터페이스 | `domain/repositories/` |
-| DB·API 클라이언트와 그 provider | `data/<클라이언트>/` (같은 파일에, `providers/` 폴더 없음) |
-| repository 구현체 | `data/repositories/` |
-| `Supabase.initialize` 같은 1회성 초기화 | `main.dart`의 `bootstrap()` |
-| 한 페이지에서만 쓰는 위젯·훅 | `pages/<page>/widgets/`, `pages/<page>/hooks/` |
-| 두 페이지 이상에서 쓰는 위젯·훅 | `presentation/widgets/`, `presentation/hooks/` |
-
-페이지끼리는 서로의 파일을 import하지 않습니다. 다른 페이지에서도 필요해지면 공용 폴더로 옮기세요.
-
----
-
-## Pages (MVVM)
-
-| 역할 | 위치 | 하는 일 |
-|---|---|---|
-| **Model** | `domain/`, `data/` | 데이터와 repository |
-| **ViewModel** | `pages/<page>/view_models/` | 화면 상태 보관, repository 호출 |
-| **View** | `pages/<page>/<page>_page.dart`, `widgets/` | 렌더링, 이벤트 전달, 내비게이션 |
-
-화면 하나에 ViewModel 하나를 둡니다. 예: `LoginPage` ↔ `LoginViewModel`
-
-```dart
-// view_models/login_view_model.dart
-@riverpod
-class LoginViewModel extends _$LoginViewModel {
-  @override
-  LoginState build() => const LoginState();
-
-  Future<void> signIn() async {
-    await ref.read(authRepositoryProvider).signIn(...);
-  }
-}
-
-// login_page.dart
-final state = ref.watch(loginViewModelProvider);
-
-onPressed: () => ref.read(loginViewModelProvider.notifier).signIn(),
-```
-
-**ViewModel**
-- 상태는 같은 파일의 `@freezed` `LoginState`를 씁니다. 한 가지만 로딩한다면 `AsyncValue<T>`도 됩니다.
-- `BuildContext`, 위젯, `material_ui`를 쓰지 않습니다.
-- 다른 화면의 ViewModel을 watch하지 않습니다. 여러 화면이 같이 쓰는 상태는 별도 provider로 빼고, 각 ViewModel이 그 provider를 watch합니다.
-
-**Page**
-- 비즈니스 로직과 repository 호출은 넣지 않습니다.
-- 내비게이션, 스낵바, 다이얼로그는 Page에서 처리합니다 (`ref.listen`).
-- 텍스트 컨트롤러, 애니메이션, 포커스처럼 UI에서만 쓰는 상태는 ViewModel이 아니라 훅에 둡니다.
-
-**그 외**
-- DI는 Riverpod provider로 합니다 (get_it 없음).
-- UseCase나 Entity/DTO 분리는 실제 로직이 있거나 형태가 달라질 때만 추가합니다.
-
----
-
-## Custom Hooks
-
-페이지와 위젯은 **훅을 한 번 호출하고 렌더링만** 합니다. 로컬 상태, 파생 값, 콜백, 컨트롤러는 모두 훅으로 옮깁니다.
-
-```dart
-// widgets/hooks/use_banner.dart
-({int current, CarouselOptions options}) useBanner() {
-  final current = useState(0);
-
-  final options = CarouselOptions(onPageChanged: (i, _) => current.value = i);
-
-  return (current: current.value, options: options);
-}
-
-// widgets/banner.dart
-final (:current, :options) = useBanner();
-```
-
-- **파일**: 훅마다 파일을 따로 만듭니다. `Banner` 위젯의 훅은 `use_banner.dart`의 `useBanner()`입니다.
-- **위치**: 페이지 훅은 `pages/<page>/hooks/`, 위젯 훅은 그 위젯 옆의 `hooks/`에 둡니다.
-- **반환**: 값이 여러 개면 named record로 반환합니다.
-- **컨트롤러**: `PageController`, `ScrollController` 등은 훅 안에서 만들어 반환합니다 (`useMemoized(X.new)`, `usePageController()`). `build()`에서 만들거나 페이지에서 내려주지 않습니다.
-- **context**가 필요하면 `useContext()`를 씁니다.
-- `useState` 같은 기본 훅 하나의 이름만 바꾸는 커스텀 훅은 만들지 않습니다.
-
----
-
-## Barrel Files
-
-폴더마다 `export` 줄만 모아 둔 barrel 파일이 있습니다. 밖에서는 이 파일 하나만 import하면 됩니다.
-
-| Barrel | 모아 두는 것 |
-|---|---|
-| `lib/src/utils/utils.dart` | 순수 Dart 헬퍼 |
-| `lib/src/domain/domain.dart` | entity, repository 인터페이스 |
-| `lib/src/data/data.dart` | DB·API 클라이언트 provider, repository 구현체 |
-| `lib/src/presentation/theme/theme.dart` | 앱 테마 |
-| `lib/src/presentation/widgets/widgets.dart` | 공용 위젯 |
-| `lib/src/presentation/hooks/hooks.dart` | 공용 훅 |
-| `lib/src/presentation/pages/pages.dart` | 각 `<page>_page.dart` (라우터용) |
-
-| 상황 | import 방법 |
-|---|---|
-| 폴더 **밖**에서 가져올 때 | barrel로: `import 'package:weus/src/domain/domain.dart';` |
-| 같은 폴더·페이지 **안**에서 | 상대 경로로 직접. 자기 barrel은 쓰지 않습니다 (순환 import 방지) |
-
-- 공개 파일을 추가하면 같은 커밋에서 barrel에 `export`도 추가합니다.
-- **모든 폴더**에 폴더 이름과 같은 barrel을 둡니다 (`data/database/database.dart`, `pages/schedule/widgets/hooks/hooks.dart`). 상위 barrel은 파일 대신 하위 barrel을 export하고, 폴더를 새로 만들면 barrel도 같이 만듭니다. `lib/src/presentation/presentation.dart`는 `pages`·`theme`·`widgets`를 모읍니다.
-- 다른 폴더의 파일은 그 폴더 barrel로 가져옵니다 (`import "widgets/widgets.dart";`). 같은 폴더 파일과 상위 폴더 파일은 상대 경로로 직접 가져옵니다 (자기·상위 barrel은 순환 import).
-- 폴더 이름과 같은 이름의 파일이 필요하면 다른 이름으로 짓습니다 (`supabase/supabase_client.dart`, `router/app_router.dart`).
-- 페이지 barrel(`pages/<page>/<page>.dart`)은 `<page>_page.dart`만 export합니다. 페이지 안의 `widgets/`·`hooks/` barrel은 그 페이지 안에서만 쓰고, 페이지 내부의 VM, 훅, 위젯은 그 페이지 전용입니다.
-- 생성 파일(`*.g.dart`, `*.freezed.dart`)은 export하지 않습니다.
-
----
-
-## Naming
-
-- 화면은 **Page**라고 부릅니다: `LoginPage` (`LoginView`, `LoginScreen`은 쓰지 않음)
-- 파일은 `pages/<page>/<page>_page.dart`입니다.
-- `ViewModel`은 MVVM 용어 그대로 씁니다.
-
-## Code Style
-
-같은 레벨의 코드 블록 사이에 빈 줄 하나를 둡니다.
-
-```dart
-final a = …;
-
-final b = …;
-
-return Column(
-  children: [
-    const Header(),
-
-    const Body(),
-  ],
-);
-```
-
-- 함수 본문의 문장 사이, 그리고 `children:` / `items:` / `branches:`의 형제 위젯 사이에 적용합니다.
-- 위젯 자신의 인자(`padding:`, `child:` …)는 빈 줄 없이 붙여 씁니다.
-- `dart format`을 돌려도 빈 줄은 그대로 유지됩니다.
+| [CLAUDE.md](CLAUDE.md) | 스택, 명령어, 공통 규칙 |
+| [architecture.md](.claude/rules/architecture.md) | 레이어, 폴더 구조, 코드 위치, barrel, 코드 스타일 |
+| [presentation.md](.claude/rules/presentation.md) | 페이지·위젯·훅 규칙, MVVM, 아이콘, 폰트, 네이밍 |
+| [forms.md](.claude/rules/forms.md) | 입력 화면의 키보드 처리 |
+| [router.md](.claude/rules/router.md) | 라우트, 딥링크, 딥링크 테스트 |
+| [database.md](.claude/rules/database.md) | drift, 날짜 저장 형식, 스키마 변경 |
+| [flavors.md](.claude/rules/flavors.md) | flavor, 앱 아이콘·스플래시, 네이티브 설정 |
+| [new-page 스킬](.claude/skills/new-page/SKILL.md) | 새 페이지 추가 절차 |
+| [reviewer 에이전트](.claude/agents/reviewer.md) | 변경분 리뷰 기준 |
+| [hooks](.claude/hooks/) | 자동 format, Material 아이콘 차단, 턴 종료 시 analyze |
