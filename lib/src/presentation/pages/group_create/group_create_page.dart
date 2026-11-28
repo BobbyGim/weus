@@ -1,11 +1,14 @@
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:lucide_icons_flutter/lucide_icons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:weus/src/presentation/theme/theme.dart";
 import "package:weus/src/presentation/widgets/widgets.dart";
 
 import "hooks/hooks.dart";
+import "widgets/widgets.dart";
 
-/// 모임 이름·소개를 받아 모임을 만든다. 만든 사람이 owner가 되고, 만들면 모임 탭으로 돌아간다.
+/// 공개 범위 → 카테고리 → 이름·소개 순서로 한 단계씩 받아 모임을 만든다.
+/// 만든 사람이 owner가 되고, 만들면 모임 탭으로 돌아간다.
 class GroupCreatePage extends HookConsumerWidget {
   const GroupCreatePage({super.key});
 
@@ -15,75 +18,142 @@ class GroupCreatePage extends HookConsumerWidget {
 
     final scheme = Theme.of(context).colorScheme;
 
-    final text = Theme.of(context).textTheme;
+    final last = form.step == groupCreateSteps - 1;
 
-    // 칸은 스크롤, 만들기 버튼은 맨 아래 고정(키보드가 올라오면 키보드 바로 위).
-    return AppLoadingOverlay(
-      loading: form.loading,
-      label: "그룹 만드는 중",
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: const AppBackButton(fallback: "/group"),
-          title: const Text("그룹 만들기"),
-        ),
-        body: SafeArea(
-          top: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: ListView(
-                  // 화면에 다 들어가면 스크롤·바운스 없음.
-                  physics: const ClampingScrollPhysics(),
+    // 뒤로가기(버튼·안드로이드 뒤로)는 이전 단계로, 첫 단계면 나가기 (iOS 스와이프는 꺼진다).
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) form.back();
+      },
+      child: AppLoadingOverlay(
+        loading: form.loading,
+        label: "그룹 만드는 중",
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              tooltip: "뒤로",
+              icon: const Icon(LucideIcons.chevronLeft),
+              onPressed: form.back,
+            ),
+            // 어느 단계에서든 바로 나가기.
+            actions: [
+              IconButton(
+                tooltip: "닫기",
+                icon: const Icon(LucideIcons.x),
+                onPressed: form.close,
+              ),
+
+              const SizedBox(width: AppSpacing.xs),
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: TweenAnimationBuilder(
+                tween: Tween<double>(end: (form.step + 1) / groupCreateSteps),
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutCubic,
+                builder: (_, value, _) => LinearProgressIndicator(
+                  value: value,
+                  minHeight: 3,
+                  color: scheme.secondary,
+                  backgroundColor: scheme.surfaceContainerHigh,
+                  // 값은 숫자(%)만 되어서 단계는 라벨에 넣는다.
+                  semanticsLabel:
+                      "그룹 만들기 $groupCreateSteps단계 중 ${form.step + 1}단계",
+                ),
+              ),
+            ),
+          ),
+          body: SafeArea(
+            top: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      PageView(
+                        controller: form.pages,
+                        // 다음 단계는 버튼으로만, 이전 단계는 버튼·가장자리 끌기로.
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          GroupCreateStep(
+                            title: "누가 이 그룹을 찾을 수 있나요?",
+                            subtitle: "만든 뒤에도 그룹 설정에서 바꿀 수 있어요",
+                            child: Column(
+                              children: [
+                                GroupVisibilityOption(
+                                  icon: LucideIcons.globe,
+                                  title: "공개 그룹",
+                                  description: "누구나 찾고 신청할 수 있어요",
+                                  pairDescription: "초대 코드로만 신청할 수 있어요",
+                                  selected: form.isPublic,
+                                  onTap: () => form.setPublic(true),
+                                ),
+
+                                const SizedBox(height: AppSpacing.sm),
+
+                                GroupVisibilityOption(
+                                  icon: LucideIcons.lock,
+                                  title: "비공개 그룹",
+                                  description: "초대 코드로만 신청할 수 있어요",
+                                  pairDescription: "누구나 찾고 신청할 수 있어요",
+                                  selected: !form.isPublic,
+                                  onTap: () => form.setPublic(false),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          GroupCreateStep(
+                            title: "어떤 활동을 하는 그룹인가요?",
+                            subtitle:
+                                "최대 3개까지 고를 수 있어요 (${form.categories.length}/3)",
+                            child: GroupCategoryChips(
+                              categories: form.options,
+                              selected: form.categories,
+                              onToggle: form.toggleCategory,
+                            ),
+                          ),
+
+                          GroupCreateStep(
+                            title: "그룹을 소개해 주세요",
+                            subtitle: "이름만 정해도 바로 만들 수 있어요",
+                            fill: true,
+                            child: GroupFormFields(
+                              name: form.name,
+                              description: form.description,
+                              fillDescription: true,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // iOS: 왼쪽 가장자리에서 끌면 이전 단계로.
+                      if (form.edgeSwipe case final swipe?)
+                        GroupCreateEdgeSwipe(
+                          onUpdate: swipe.update,
+                          onEnd: swipe.end,
+                          onCancel: swipe.cancel,
+                        ),
+                    ],
+                  ),
+                ),
+
+                Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.xl,
                     AppSpacing.sm,
                     AppSpacing.xl,
                     AppSpacing.lg,
                   ),
-                  children: [
-                    GroupFormFields(
-                      name: form.name,
-                      description: form.description,
-                      categories: form.options,
-                      selected: form.categories,
-                      onToggleCategory: form.toggleCategory,
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: form.isPublic,
-                      onChanged: form.setPublic,
-                      title: Text("공개 그룹", style: text.titleMedium),
-                      subtitle: Text(
-                        form.isPublic
-                            ? "그룹 찾기에서 누구나 찾고 가입 신청할 수 있어요"
-                            : "초대 코드를 받은 사람만 가입 신청할 수 있어요",
-                        style: text.bodyMedium!.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
+                  child: FilledButton(
+                    onPressed: form.next,
+                    child: Text(last ? "그룹 만들기" : "다음"),
+                  ),
                 ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.sm,
-                  AppSpacing.xl,
-                  AppSpacing.lg,
-                ),
-                child: FilledButton(
-                  onPressed: form.submit,
-                  child: const Text("그룹 만들기"),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

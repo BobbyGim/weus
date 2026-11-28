@@ -1,4 +1,5 @@
 export "group_card.dart";
+export "group_category_chips.dart";
 export "group_form_fields.dart";
 export "group_hero_scaffold.dart";
 export "group_image.dart";
