@@ -12,6 +12,12 @@ cp .env.example .env.dev && cp .env.example .env.staging && cp .env.example .env
 dart run build_runner build -d
 ```
 
+**코드 생성 (`build_runner`)은 빌드 전에 꼭 실행해야 합니다.** `json_serializable`(JSON 직렬화), `freezed`(모델), `riverpod_generator`(provider), `drift`(DB)가 만드는 생성 파일(`*.g.dart`, `*.freezed.dart`)은 git에 올라가지 않아서, 실행하지 않으면 빌드 에러가 납니다.
+
+- 처음 clone하거나 pull한 뒤에 실행합니다.
+- `@JsonSerializable`, `@freezed`, `@riverpod`, drift 테이블을 고친 뒤에도 다시 실행합니다.
+- 개발 중에는 `dart run build_runner watch -d`를 켜 두면 저장할 때마다 자동으로 다시 만듭니다.
+
 ### 2. Run
 
 ```bash
