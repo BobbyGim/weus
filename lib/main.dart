@@ -1,5 +1,8 @@
 import "dart:async";
 
+// table_calendar가 아직 flutter/material을 써서 그쪽 Material이 필요하다 (아래 builder).
+// ignore: deprecated_member_use
+import "package:flutter/material.dart" as legacy show Material, MaterialType;
 import "package:flutter/services.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -109,7 +112,16 @@ class MyApp extends ConsumerWidget {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Stack(
           children: [
-            ExcludeSemantics(excluding: offline, child: child),
+            // table_calendar 같은 패키지는 flutter/material의 InkWell을 써서 그쪽
+            // Material이 위에 있어야 한다 (앱의 material_ui Material과 다른 타입).
+            // 안드로이드에서만 InkWell을 써서 없으면 일정 탭이 빨간 에러 화면이 된다.
+            ExcludeSemantics(
+              excluding: offline,
+              child: legacy.Material(
+                type: legacy.MaterialType.transparency,
+                child: child,
+              ),
+            ),
 
             if (offline)
               OfflinePage(onRetry: () => ref.invalidate(offlineProvider)),
